@@ -52,7 +52,7 @@ Feature: Training on Lingo
   # 2.    Na vijf raadpogingen binnen een ronde is de speler af
   #failure path
     Given I am playing a game
-    When I guessed 5 times incorrectly
+    When I guessed "5" times incorrectly
     Then I lose the game
 
   # 3.    Speler kan geen woord raden als het woord al geraden is
