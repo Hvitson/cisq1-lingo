@@ -3,6 +3,8 @@ package nl.hu.cisq1.lingo.words.domain;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity(name = "words")
 public class Word {
@@ -23,5 +25,15 @@ public class Word {
 
     public Integer getLength() {
         return length;
+    }
+
+    public List<Character> wordToChars() {
+        List<Character> chars = new ArrayList<>();
+
+        for (Character character : this.value.toCharArray()) {
+            chars.add(character);
+        }
+
+        return chars;
     }
 }
