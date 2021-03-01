@@ -12,16 +12,28 @@ public class Hint {
     private List<Character> hint;
 
     public Hint(List<Character> characters) {
-        this.hint = characters;
+        hint = characters;
     }
 
-    public static Hint createStartHint(Word word) {
-        List<Character> startHint = new ArrayList<>();
-        List<Character> wordToGuess = word.wordToChars();
+    public static Hint playHint(Hint lastHint, List<Mark> marks, Word word) {
+        if (lastHint == null) {
+            return createFirstHint(word);
+        }
+        if (word.getLength() != marks.size() || word.getLength() != lastHint.getHint().size() || marks.stream().anyMatch(mark -> mark == INVALID)) {
+            throw new InvalidHintException("invalid hint");
+        }
+         else {
+            return createHint(lastHint, marks, word);
+        }
+    }
 
-        for (int i = 0; i < wordToGuess.size(); i++) {
+    public static Hint createFirstHint(Word word) {
+        List<Character> startHint = new ArrayList<>();
+        List<Character> wordChars = word.wordToChars();
+
+        for (int i = 0; i < wordChars.size(); i++) {
             if(i == 0){
-                startHint.add(wordToGuess.get(0));
+                startHint.add(wordChars.get(0));
             }
             else {
                 startHint.add('.');
@@ -30,23 +42,15 @@ public class Hint {
         return new Hint(startHint);
     }
 
-    public static Hint calculateHint(Hint lastHint, List<Mark> marks, Word value) {
+    public static Hint createHint(Hint lastHint, List<Mark> marks, Word word) {
         List<Character> newHint = new ArrayList<>();
         int i = 0;
 
-        if (lastHint == null) {
-            lastHint = createStartHint(value);
-        }
-        if (marks.size() != lastHint.getHint().size() || marks.size() != value.getLength()) {
-            throw new InvalidHintException("invalid hint");
-        }
-
         System.out.println("hint voor transformatie: " + lastHint);
         for (Character character : lastHint.getHint()) {
-            System.out.println(character);
             if (character == '.') {
                 if (marks.get(i) == CORRECT) {
-                    newHint.add(value.wordToChars().get(i));
+                    newHint.add(word.wordToChars().get(i));
                 } else {
                     newHint.add('.');
                 }
@@ -61,7 +65,7 @@ public class Hint {
     }
 
     public List<Character> getHint() {
-        return this.hint;
+        return hint;
     }
 
     @Override

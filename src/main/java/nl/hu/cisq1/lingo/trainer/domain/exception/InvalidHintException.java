@@ -5,5 +5,3 @@ public class InvalidHintException extends RuntimeException {
         super(string);
     }
 }
-
-
