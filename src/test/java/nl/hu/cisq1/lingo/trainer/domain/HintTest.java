@@ -26,6 +26,15 @@ public class HintTest {
         );
     }
 
+    private static Stream<Arguments> provideWrongMarksExamples() {
+        return Stream.of(
+                Arguments.of(new Hint(List.of('w','.','.','.','.')), new Word("wonen"), List.of(INVALID, INVALID, INVALID, INVALID, INVALID, INVALID)),
+                Arguments.of(new Hint(List.of('w','.','.','.','.')), new Word("wonen"), List.of(INVALID, INVALID, INVALID, INVALID, INVALID)),
+                Arguments.of(new Hint(List.of('w','.','.','.','.')), new Word("wonen"), List.of(INVALID, INVALID, INVALID, INVALID)),
+                Arguments.of(new Hint(List.of('w','.','.','.','.')), new Word("wonen"), List.of(CORRECT, INVALID,INVALID, INVALID, INVALID))
+        );
+    }
+
     @Test
     @DisplayName("hint is created correctly")
     void hintCreatedCorrectly() {
@@ -36,40 +45,31 @@ public class HintTest {
     @Test
     @DisplayName("hint is created correctly when hint is null")
     void hintCreatedCorrectlyWithNull() {
-        assertEquals(new Hint(List.of('w','.','.','.','.')).getHint(), Hint.playHint(null, List.of(CORRECT, PRESENT, ABSENT, ABSENT, ABSENT), new Word("wonen")).getHint());
+        Hint hint = Hint.playHint(null, List.of(CORRECT, PRESENT, ABSENT, ABSENT, ABSENT), new Word("wonen"));
+        assertEquals(new Hint(List.of('w','.','.','.','.')).getHint(), hint.getHint());
+    }
+
+    @Test
+    @DisplayName("hint is created correctly when marks contain invalid")
+    void hintCreatedCorrectlyWithInvalid() {
+        Hint hint = Hint.playHint(null, List.of(CORRECT, PRESENT, ABSENT, ABSENT, ABSENT), new Word("wonen"));
+        assertEquals(new Hint(List.of('w','.','.','.','.')).getHint(), hint.getHint());
     }
 
     @ParameterizedTest
     @MethodSource("provideHintExamples")
-    @DisplayName("hints is correct after update")
-    void hintIsCorrect(Hint lastHint, Word value, List<Mark> marks, Hint expectedHint) {
-        Hint hint = Hint.playHint(lastHint, marks, value);
-
+    @DisplayName("hints are correct after update")
+    void hintIsCorrect(Hint lastHint, Word wordToGuess, List<Mark> marks, Hint expectedHint) {
+        Hint hint = Hint.playHint(lastHint, marks, wordToGuess);
         assertEquals(expectedHint.getHint(), hint.getHint());
     }
 
-    //Incorrect hints tests
-    private static Stream<Arguments> provideHintIncorrectExamples() {
-        return Stream.of(
-                //length of marks invalid not same length as word
-                Arguments.of(new Hint(List.of('w','.','.','.','.')), new Word("wonen"), List.of(CORRECT, PRESENT, ABSENT, ABSENT)),
-                //length of previousHint invalid not same length as word
-                Arguments.of(new Hint(List.of('w','.','.','.')), new Word("woest"), List.of(CORRECT, CORRECT, ABSENT, ABSENT, ABSENT)),
-                //length of marks and previousHint not same length as word
-                Arguments.of(new Hint(List.of('w','o','.','.','.')), new Word("woer"), List.of(CORRECT, CORRECT, ABSENT, CORRECT, CORRECT)),
-                //marks INVALID
-                Arguments.of(new Hint(List.of('w','o','.','r','d')), new Word("woord"), List.of(INVALID, INVALID, INVALID, INVALID, INVALID)),
-                Arguments.of(new Hint(List.of('w','o','.','r','d')), new Word("woord"), List.of(INVALID, INVALID, INVALID, INVALID, INVALID, INVALID))
-        );
-    }
-
     @ParameterizedTest
-    @MethodSource("provideHintIncorrectExamples")
-    @DisplayName("hint is incorrect when marks are invalid, marks and lastHint not same length as word")
-    void hintIsNotCorrect(Hint lastHint, Word value, List<Mark> marks) {
-        assertThrows(
-                InvalidHintException.class,
-                () -> Hint.playHint(lastHint, marks, value)
-        );
+    @MethodSource("provideWrongMarksExamples")
+    @DisplayName("if marks contain invalid last hint is new hint")
+    void hintIsCorrect(Hint lastHint, Word wordToGuess, List<Mark> marks) {
+        Hint hint = Hint.playHint(lastHint, marks, wordToGuess);
+
+        assertEquals(lastHint.getHint(), hint.getHint());
     }
 }

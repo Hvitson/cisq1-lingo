@@ -31,7 +31,7 @@ class FeedbackTest {
     @DisplayName("marks created without attempt")
     void marksCreatedCorrectlyWithoutAttempt() {
         List<Mark> marks = Feedback.createMarks("", new Word("wooon"));
-        assertEquals(List.of(INVALID), marks);
+        assertEquals(List.of(CORRECT, ABSENT, ABSENT, ABSENT, ABSENT), marks);
     }
 
     @Test
@@ -56,10 +56,18 @@ class FeedbackTest {
     }
 
     @Test
-    @DisplayName("guess is invalid if no letters are invalid")
+    @DisplayName("guess is valid if no marks are invalid")
     void guessIsValid() {
-        Feedback feedback = new Feedback("woort", new Word("woord"), new Hint(List.of('w','o','o','r','.')));
+        Feedback feedback = new Feedback("wooor", new Word("woord"), new Hint(List.of('w','o','o','r','.')));
         assertTrue(feedback.isGuessValid());
+    }
+
+    @Test
+    @DisplayName("1111guess is valid if no marks are invalid")
+    void guessIsInvalid() {
+        Feedback feedback = new Feedback("er", new Word("woord"), new Hint(List.of('w','o','o','r','.')));
+        System.out.println(feedback.getMarks());
+        assertFalse(feedback.isGuessValid());
     }
 
     @Test
@@ -73,13 +81,12 @@ class FeedbackTest {
     //todo: overbodig wordt opgevangen binnen hint? if uit feedback constructor?
     private static Stream<Arguments> provideIncorrectFeedbackExamples() {
         return Stream.of(
-                //marks length incorrect
-                Arguments.of(new Hint(List.of('w','.','.','.','.')), "wonen", new Word("wee")),
+                //attempt length incorrect
+                Arguments.of(new Hint(List.of('w','.','.','.','.')), "wonn", new Word("weeee")),
                 //hints length incorrect
-                Arguments.of(new Hint(List.of('w','.')), "wonen", new Word("wen")),
-                //marks and hints length incorrect
-                Arguments.of(new Hint(List.of('w','.','.','.','.')), "", new Word("wne")),
-                //marks invalid
+                Arguments.of(new Hint(List.of('w','.')), "weeee", new Word("wonen")),
+                //attempt and hint incorrect
+                Arguments.of(new Hint(List.of('w','.','.','.')), "", new Word("wonen")),
                 Arguments.of(new Hint(List.of('w','.','.','.','.')), "wonen", new Word("wne")),
                 Arguments.of(new Hint(List.of('w','.','.','.','.')), "w"    , new Word("woord"))
         );

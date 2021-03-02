@@ -11,32 +11,29 @@ import static nl.hu.cisq1.lingo.trainer.domain.Mark.*;
 
 public class Feedback {
     private final String attempt;
-    private final Word word;
-    private final Hint hint;
-    private final List<Mark> marks;
+    private final Word wordToGuess;
+    private Hint hint;
+    private List<Mark> marks;
 
-    public Feedback(String attempt, Word word, Hint lastHint) {
+    public Feedback(String attempt, Word wordToGuess, Hint lastHint) {
         //todo: zorgt voor onnodige tests? wordt opgegvangen binnen hints met InvalidHintFeedback()
-//        if (attempt.length() != lastHint.getHint().size() || attempt.length() != word.getLength()) {
-//            throw new InvalidFeedbackException("Invalid feedback");
-//        }
         this.attempt = attempt;
-        this.word = word;
-        marks = createMarks(attempt, this.word);
-        hint = Hint.playHint(lastHint, marks, word);
+        this.wordToGuess = wordToGuess;
+        marks = createMarks(attempt, this.wordToGuess);
+        hint = Hint.playHint(lastHint, marks, wordToGuess);
     }
 
-        public static List<Mark> createMarks(String attempt, Word word) {
+    public static List<Mark> createMarks(String attempt, Word wordToGuess) {
         List<Mark> marks = new ArrayList<>();
         List<Character> charactersAttempt = new ArrayList<>();
-        List<Character> charactersWord = word.wordToChars();
+        List<Character> charactersWordToGuess = wordToGuess.wordToChars();
 
         for (char character : attempt.toCharArray()) {
             charactersAttempt.add(character);
         }
 
         if (attempt.equals("")) {
-            for (int i = 0; i < charactersWord.size(); i++) {
+            for (int i = 0; i < charactersWordToGuess.size(); i++) {
                 if (i==0) {
                     marks.add(CORRECT);
                 } else {
@@ -46,7 +43,7 @@ public class Feedback {
             return marks;
         }
 
-        if (attempt.length() != word.getLength()) {
+        if (attempt.length() != wordToGuess.getLength()) {
             //todo(na overleg?): opvangen door InvalidFeedbackException waarom fout opslaan?
 
             for (int i = 0; i< attempt.length(); i++) {
@@ -58,10 +55,10 @@ public class Feedback {
 
 
         //invalid toevoegen abi lan
-        for (int i = 0; i < charactersWord.size(); i++) {
-            if (charactersAttempt.get(i) == charactersWord.get(i)) {
+        for (int i = 0; i < charactersWordToGuess.size(); i++) {
+            if (charactersAttempt.get(i) == charactersWordToGuess.get(i)) {
                 marks.add(CORRECT);
-            } else if (charactersWord.contains(charactersAttempt.get(i))) {
+            } else if (charactersWordToGuess.contains(charactersAttempt.get(i))) {
                 marks.add(PRESENT);
             } else {
                 marks.add(ABSENT);
@@ -78,10 +75,9 @@ public class Feedback {
         return marks.stream().noneMatch(mark -> mark == INVALID);
     }
 
-    boolean isGuessInvalid() {
-        return marks.stream().anyMatch(mark -> mark == INVALID);
+    public List<Mark> getMarks() {
+        return marks;
     }
-
 
     @Override
     public boolean equals(Object o) {

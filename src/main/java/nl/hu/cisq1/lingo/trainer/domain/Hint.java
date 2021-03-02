@@ -15,25 +15,20 @@ public class Hint {
         hint = characters;
     }
 
-    public static Hint playHint(Hint lastHint, List<Mark> marks, Word word) {
+    public static Hint playHint(Hint lastHint, List<Mark> marks, Word wordToGuess) {
         if (lastHint == null) {
-            return createFirstHint(word);
-        }
-        if (word.getLength() != marks.size() || word.getLength() != lastHint.getHint().size() || marks.stream().anyMatch(mark -> mark == INVALID)) {
-            throw new InvalidHintException("invalid hint");
-        }
-         else {
-            return createHint(lastHint, marks, word);
+            return createFirstHint(wordToGuess);
+        } else {
+            return createHint(lastHint, marks, wordToGuess);
         }
     }
 
-    public static Hint createFirstHint(Word word) {
+    public static Hint createFirstHint(Word wordToGuess) {
         List<Character> startHint = new ArrayList<>();
-        List<Character> wordChars = word.wordToChars();
 
-        for (int i = 0; i < wordChars.size(); i++) {
+        for (int i = 0; i < wordToGuess.wordToChars().size(); i++) {
             if(i == 0){
-                startHint.add(wordChars.get(0));
+                startHint.add(wordToGuess.wordToChars().get(0));
             }
             else {
                 startHint.add('.');
@@ -42,15 +37,17 @@ public class Hint {
         return new Hint(startHint);
     }
 
-    public static Hint createHint(Hint lastHint, List<Mark> marks, Word word) {
+    public static Hint createHint(Hint lastHint, List<Mark> marks, Word wordToGuess) {
         List<Character> newHint = new ArrayList<>();
         int i = 0;
-
         System.out.println("hint voor transformatie: " + lastHint);
+        if (marks.contains(INVALID)) {
+            return lastHint;
+        }
         for (Character character : lastHint.getHint()) {
             if (character == '.') {
                 if (marks.get(i) == CORRECT) {
-                    newHint.add(word.wordToChars().get(i));
+                    newHint.add(wordToGuess.wordToChars().get(i));
                 } else {
                     newHint.add('.');
                 }
