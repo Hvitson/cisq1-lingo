@@ -4,16 +4,13 @@ import nl.hu.cisq1.lingo.words.domain.Word;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class Round {
-    private final UUID id;
     private final Word word;
     private Integer guesses;
     private final List<Feedback> feedbacks;
 
     public Round(Word word) {
-        id = UUID.randomUUID();
         this.word = word;
         guesses = 0;
         this.feedbacks = new ArrayList<>();
@@ -28,7 +25,6 @@ public class Round {
 
     public boolean isRoundOver() {
         Feedback lastFeedback = getLastFeedback();
-        System.out.println("feedback volgens getLastFeedback" + lastFeedback);
         if (this.guesses < 5) {
             return lastFeedback.isWordGuessed();
         }
@@ -44,8 +40,7 @@ public class Round {
     @Override
     public String toString() {
         return "Round{" +
-                "id=" + id +
-                ", word=" + word +
+                "word=" + word +
                 ", guesses=" + guesses +
                 ", feedbacks=" + feedbacks +
                 '}';

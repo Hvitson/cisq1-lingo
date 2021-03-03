@@ -5,6 +5,7 @@ import nl.hu.cisq1.lingo.words.domain.Word;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import static nl.hu.cisq1.lingo.trainer.domain.Mark.*;
@@ -45,16 +46,12 @@ public class Feedback {
 
         if (attempt.length() != wordToGuess.getLength()) {
             //todo(na overleg?): opvangen door InvalidFeedbackException waarom fout opslaan?
-
             for (int i = 0; i< attempt.length(); i++) {
                 marks.add(INVALID);
             }
             return marks;
         }
 
-
-
-        //invalid toevoegen abi lan
         for (int i = 0; i < charactersWordToGuess.size(); i++) {
             if (charactersAttempt.get(i) == charactersWordToGuess.get(i)) {
                 marks.add(CORRECT);
@@ -79,17 +76,22 @@ public class Feedback {
         return marks;
     }
 
+    public Hint getHint() {
+        return hint;
+    }
+
+    //todo: fix tests
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Feedback feedback = (Feedback) o;
-        return Objects.equals(attempt, feedback.attempt) && Objects.equals(marks, feedback.marks) && Objects.equals(hint, feedback.hint);
+        return Objects.equals(attempt, feedback.attempt) && Objects.equals(wordToGuess, feedback.wordToGuess) && Objects.equals(hint, feedback.hint) && Objects.equals(marks, feedback.marks);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(attempt, marks, hint);
+        return Objects.hash(attempt, wordToGuess, hint, marks);
     }
 
     @Override

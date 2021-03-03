@@ -42,6 +42,21 @@ class FeedbackTest {
     }
 
     @Test
+    @DisplayName("gets list marks from feedback")
+    void getMarks() {
+        Feedback feedback = new Feedback("woord", new Word("woord"), new Hint(List.of('w','o','o','r','.')));
+        assertEquals(List.of(CORRECT, CORRECT, CORRECT, CORRECT, CORRECT), feedback.getMarks());
+    }
+
+    @Test
+    @DisplayName("gets list of marks from feedback containing Invalid because wrong attempt")
+    void getInvalidMarks() {
+        Feedback feedback = new Feedback("wr", new Word("woord"),
+                Hint.playHint(new Hint(List.of('w','o','o','r','.')), List.of(INVALID, INVALID), new Word("woord")));
+        assertEquals(List.of(INVALID, INVALID), feedback.getMarks());
+    }
+
+    @Test
     @DisplayName("word is guessed if all letters are correct")
     void wordIsGuessed() {
         Feedback feedback = new Feedback("woord", new Word("woord"), new Hint(List.of('w','o','o','r','d')));
@@ -63,42 +78,34 @@ class FeedbackTest {
     }
 
     @Test
-    @DisplayName("1111guess is valid if no marks are invalid")
+    @DisplayName("guess is valid if no marks are invalid")
     void guessIsInvalid() {
         Feedback feedback = new Feedback("er", new Word("woord"), new Hint(List.of('w','o','o','r','.')));
-        System.out.println(feedback.getMarks());
         assertFalse(feedback.isGuessValid());
     }
 
+    //todo: werkt alleen met toString
     @Test
-    @DisplayName("guess is valid if no letters are invalid")
+    @DisplayName("gets hint from feedback")
+    void feedbackGetHint() {
+        Feedback feedback = new Feedback("er", new Word("woord"), new Hint(List.of('w','o','o','r','.')));
+        assertEquals(new Hint(List.of('w','o','o','r','.')).toString(), feedback.getHint().toString());
+    }
+
+    //todo: vragen how to get worky werkt alleen met toString
+    @Test
+    @DisplayName("feedback is created correctly")
     void feedbackIsCorrect() {
         Feedback feedback = new Feedback("woerd", new Word("woord"), new Hint(List.of('w','o','.','r','d')));
+        assertTrue(feedback.isGuessValid());
         assertEquals(new Feedback("woerd", new Word("woord"), new Hint(List.of('w','o','.','r','d'))).toString(), feedback.toString());
     }
 
-
-    //todo: overbodig wordt opgevangen binnen hint? if uit feedback constructor?
-    private static Stream<Arguments> provideIncorrectFeedbackExamples() {
-        return Stream.of(
-                //attempt length incorrect
-                Arguments.of(new Hint(List.of('w','.','.','.','.')), "wonn", new Word("weeee")),
-                //hints length incorrect
-                Arguments.of(new Hint(List.of('w','.')), "weeee", new Word("wonen")),
-                //attempt and hint incorrect
-                Arguments.of(new Hint(List.of('w','.','.','.')), "", new Word("wonen")),
-                Arguments.of(new Hint(List.of('w','.','.','.','.')), "wonen", new Word("wne")),
-                Arguments.of(new Hint(List.of('w','.','.','.','.')), "w"    , new Word("woord"))
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideIncorrectFeedbackExamples")
-    @DisplayName("hint is incorrect when marks are invalid, marks and lastHint not same length as word")
-    void feedbackIsNotCorrect(Hint hint, String attempt, Word word) {
-        assertThrows(
-                InvalidFeedbackException.class,
-                () -> new Feedback(attempt, word, hint)
-        );
+    @Test
+    @DisplayName("feedback toString is created correctly")
+    void feedbackToString() {
+        Feedback feedback = new Feedback("woerd", new Word("woord"), new Hint(List.of('w','o','.','r','d')));
+        System.out.println(feedback);
+        assertEquals("Feedback{attempt='woerd', marks=[CORRECT, CORRECT, ABSENT, CORRECT, CORRECT], hint=[w, o, ., r, d]}", feedback.toString());
     }
 }
