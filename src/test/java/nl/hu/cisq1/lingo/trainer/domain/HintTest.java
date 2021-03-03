@@ -39,21 +39,21 @@ public class HintTest {
     @DisplayName("hint is created correctly")
     void hintCreatedCorrectly() {
         Hint hint = new Hint(List.of('w','.','.','.','.'));
-        assertEquals(new Hint(List.of('w','.','.','.','.')).getHint(), hint.getHint());
+        assertEquals(List.of('w','.','.','.','.'), hint.getHint());
     }
 
     @Test
     @DisplayName("hint is created correctly when hint is null")
     void hintCreatedCorrectlyWithNull() {
         Hint hint = Hint.playHint(null, List.of(CORRECT, PRESENT, ABSENT, ABSENT, ABSENT), new Word("wonen"));
-        assertEquals(new Hint(List.of('w','.','.','.','.')).getHint(), hint.getHint());
+        assertEquals(List.of('w','.','.','.','.'), hint.getHint());
     }
 
     @Test
     @DisplayName("hint is created correctly when marks contain invalid")
     void hintCreatedCorrectlyWithInvalid() {
         Hint hint = Hint.playHint(null, List.of(CORRECT, PRESENT, ABSENT, ABSENT, ABSENT), new Word("wonen"));
-        assertEquals(new Hint(List.of('w','.','.','.','.')).getHint(), hint.getHint());
+        assertEquals(List.of('w','.','.','.','.'), hint.getHint());
     }
 
     @ParameterizedTest

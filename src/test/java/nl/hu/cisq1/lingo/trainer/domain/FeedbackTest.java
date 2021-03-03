@@ -89,7 +89,7 @@ class FeedbackTest {
     @DisplayName("gets hint from feedback")
     void feedbackGetHint() {
         Feedback feedback = new Feedback("er", new Word("woord"), new Hint(List.of('w','o','o','r','.')));
-        assertEquals(new Hint(List.of('w','o','o','r','.')).toString(), feedback.getHint().toString());
+        assertEquals(List.of('w','o','o','r','.'), feedback.getHint().getHint());
     }
 
     //todo: vragen how to get worky werkt alleen met toString

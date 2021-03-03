@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Hint {
-    private List<Character> hint;
+    private final List<Character> hint;
 
-    public Hint(List<Character> characters) {
-        hint = characters;
+    public Hint(List<Character> hint) {
+        this.hint = hint;
     }
 
     public static Hint playHint(Hint lastHint, List<Mark> marks, Word wordToGuess) {
