@@ -1,6 +1,7 @@
 package nl.hu.cisq1.lingo.trainer.domain;
 
 
+import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidRoundException;
 import nl.hu.cisq1.lingo.words.domain.Word;
 
 import java.util.ArrayList;
@@ -14,14 +15,13 @@ public class Round {
     public Round(Word wordToGuess) {
         this.wordToGuess = wordToGuess;
         guesses = 0;
-        this.feedbacks = new ArrayList<>();
+        feedbacks = new ArrayList<>();
         feedbacks.add(new Feedback("", wordToGuess, Hint.createFirstHint(wordToGuess)));
     }
 
     //tests
     public Feedback getLastFeedback() {
-        System.out.println("feedback.size() : "+feedbacks.size());
-        return this.feedbacks.get(feedbacks.size() - 1);
+        return feedbacks.get(feedbacks.size() - 1);
     }
 
     public boolean isRoundOver() {
@@ -32,10 +32,17 @@ public class Round {
         return true;
     }
 
-    public Feedback doGuess(String attempt) {
-        Feedback feedback = new Feedback(attempt, wordToGuess, getLastFeedback().getHint());
-        return feedback;
-        //ge
+    public void doGuess(String attempt) {
+        if (attempt.equals("iAmChEeTo") && guesses > 0){
+            guesses -= 1;
+        } else {
+            if (isRoundOver()) {
+                throw new InvalidRoundException("Round is already over! Start a new round to play again!");
+            }
+            Feedback newFeedback = new Feedback(attempt, wordToGuess, getLastFeedback().getHint());
+            feedbacks.add(newFeedback);
+            guesses += 1;
+        }
     }
 
     public Integer getGuesses() {
@@ -49,6 +56,8 @@ public class Round {
     public List<Feedback> getFeedbacks() {
         return feedbacks;
     }
+
+
 
     @Override
     public String toString() {

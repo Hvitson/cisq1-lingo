@@ -2,18 +2,11 @@ package nl.hu.cisq1.lingo.trainer.domain;
 
 import static nl.hu.cisq1.lingo.trainer.domain.Mark.*;
 
-import ch.qos.logback.core.encoder.LayoutWrappingEncoder;
-import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidFeedbackException;
 import nl.hu.cisq1.lingo.words.domain.Word;
-import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -84,7 +77,6 @@ class FeedbackTest {
         assertFalse(feedback.isGuessValid());
     }
 
-    //todo: werkt alleen met toString
     @Test
     @DisplayName("gets hint from feedback")
     void feedbackGetHint() {
