@@ -1,11 +1,9 @@
 package nl.hu.cisq1.lingo.trainer.domain;
 
-import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidFeedbackException;
 import nl.hu.cisq1.lingo.words.domain.Word;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 import static nl.hu.cisq1.lingo.trainer.domain.Mark.*;
@@ -13,12 +11,13 @@ import static nl.hu.cisq1.lingo.trainer.domain.Mark.*;
 public class Feedback {
     private final String attempt;
     private final Word wordToGuess;
-    private Hint hint;
-    private List<Mark> marks;
+    private final Hint hint;
+    private final List<Mark> marks;
 
     public Feedback(String attempt, Word wordToGuess, Hint lastHint) {
         //todo: zorgt voor onnodige tests? wordt opgegvangen binnen hints met InvalidHintFeedback()
-        this.attempt = attempt;
+        //todo: toLowerCase() nodig?
+        this.attempt = attempt.toLowerCase();
         this.wordToGuess = wordToGuess;
         marks = createMarks(attempt, this.wordToGuess);
         hint = Hint.playHint(lastHint, marks, wordToGuess);
