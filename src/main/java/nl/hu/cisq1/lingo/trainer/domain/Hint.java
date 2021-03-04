@@ -23,7 +23,7 @@ public class Hint {
         }
     }
 
-    public static Hint createFirstHint(Word wordToGuess) {
+    private static Hint createFirstHint(Word wordToGuess) {
         List<Character> startHint = new ArrayList<>();
 
         for (int i = 0; i < wordToGuess.wordToChars().size(); i++) {
@@ -37,7 +37,7 @@ public class Hint {
         return new Hint(startHint);
     }
 
-    public static Hint createHint(Hint lastHint, List<Mark> marks, Word wordToGuess) {
+    private static Hint createHint(Hint lastHint, List<Mark> marks, Word wordToGuess) {
         List<Character> newHint = new ArrayList<>();
         int i = 0;
         System.out.println("hint voor transformatie: " + lastHint);

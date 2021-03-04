@@ -2,6 +2,7 @@ package nl.hu.cisq1.lingo.trainer.domain;
 
 import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidRoundException;
 import nl.hu.cisq1.lingo.words.domain.Word;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,30 +19,33 @@ import static nl.hu.cisq1.lingo.trainer.domain.Mark.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class RoundTest {
+    private Round round;
+
+    @BeforeEach
+    void beginRound() {
+        round = new Round(new Word("wonen"));
+    }
+
+
 
     //todo: ook alleen toString()
     @Test
     @DisplayName("check if round is created it also creates correct hint")
     void creatingRoundCreatesCorrectHint() {
-        Round round = new Round(new Word("hallo"));
-        assertEquals(new Hint(List.of('h','.','.','.','.')).toString(), round.getLastFeedback().getHint().toString());
+        assertEquals(new Hint(List.of('w','.','.','.','.')).toString(), round.getLastFeedback().getHint().toString());
     }
 
 
     @Test
     @DisplayName("check if round is not still playable")
     void roundIsPlayable() {
-        Round round = new Round(new Word("pjooo"));
-
         assertFalse(round.isRoundOver());
     }
 
     @Test
     @DisplayName("check if round is over after guessing 5 times")
     void RoundIsOverTooManyGuesses() {
-        Round round = new Round(new Word("pjooo"));
         round.setGuesses(5);
-
         assertTrue(round.isRoundOver());
     }
 
@@ -59,41 +63,35 @@ public class RoundTest {
     @Test
     @DisplayName("check if last feedback is conform Feedback")
     void getLastFeedbackFormatCheck() {
-        Round round = new Round(new Word("pjooo"));
-        assertEquals(new Feedback("", new Word("pjooo"), new Hint(List.of('p','.','.','.','.'))).toString(), round.getLastFeedback().toString());
+        assertEquals(new Feedback("", new Word("wonen"), new Hint(List.of('w','.','.','.','.'))).toString(), round.getLastFeedback().toString());
     }
 
     @Test
     @DisplayName("check if last feedback is last feedback when wordToGuess is guessed")
     void getLastFeedbackWhenWordIsGuessed() {
-        Round round = new Round(new Word("pjooo"));
-        round.doGuess("pjooo");
-
-        assertEquals(new Feedback("pjooo", new Word("pjooo"), new Hint(List.of('p','j','o','o','o'))).toString(), round.getLastFeedback().toString());
+        round.doGuess("wonen");
+        assertEquals(new Feedback("wonen", new Word("wonen"), new Hint(List.of('w','o','n','e','n'))).toString(), round.getLastFeedback().toString());
     }
 
     @Test
     @DisplayName("check if last feedback is last feedback when guess is valid")
     void getLastFeedbackWhenGeussIsValid() {
-        Round round = new Round(new Word("pjooo"));
-        round.doGuess("pjooe");
-        assertEquals(new Feedback("pjooe", new Word("pjooo"), new Hint(List.of('p','j','o','o','.'))).toString(), round.getLastFeedback().toString());
+        round.doGuess("wonee");
+        assertEquals(new Feedback("wonee", new Word("wonen"), new Hint(List.of('w','o','n','e','.'))).toString(), round.getLastFeedback().toString());
     }
 
     @Test
     @DisplayName("check if last feedback is last feedback when guess is invalid")
     void getLastFeedbackWhenGeussIsInvalid() {
-        Round round = new Round(new Word("pjooo"));
         round.doGuess("sd");
 
-        assertEquals(new Feedback("sd", new Word("pjooo"), new Hint(List.of('p','.','.','.','.'))).toString(), round.getLastFeedback().toString());
+        assertEquals(new Feedback("sd", new Word("wonen"), new Hint(List.of('w','.','.','.','.'))).toString(), round.getLastFeedback().toString());
     }
 
     //overbodig?
     @Test
     @DisplayName("Testing testGeuss on a round")
     void doTestGuess() {
-        Round round = new Round(new Word("wonen"));
         Feedback feedback = new Feedback("schon", new Word("wonen"), new Hint(List.of('w','.','.','.','.')));
         List<Feedback> roundFeedbacks = round.getFeedbacks();
         roundFeedbacks.add(feedback);
@@ -107,7 +105,6 @@ public class RoundTest {
     @Test
     @DisplayName("Testing geuss on a round")
     void doGuess() {
-        Round round = new Round(new Word("wonen"));
         round.doGuess("schon");
 
         assertEquals(List.of(ABSENT, ABSENT, ABSENT, PRESENT, CORRECT), round.getLastFeedback().getMarks());
@@ -118,7 +115,6 @@ public class RoundTest {
     @Test
     @DisplayName("Testing geuss on a round with invalid guess")
     void doGuessWithInvalidGuess() {
-        Round round = new Round(new Word("wonen"));
         round.doGuess("df");
 
         assertEquals(List.of(INVALID, INVALID), round.getLastFeedback().getMarks());
@@ -129,7 +125,6 @@ public class RoundTest {
     @Test
     @DisplayName("checking if cheeto worky")
     void cheetoWorky() {
-        Round round = new Round(new Word("wonen"));
         round.doGuess("df");
         Feedback feedbackVoorCheetoGuess = round.getLastFeedback();
         round.doGuess("iAmChEeTo");
@@ -171,5 +166,15 @@ public class RoundTest {
     void getRoundToString() {
         Round round = new Round(new Word("pjooo"));
         assertEquals("Round{wordToGuess=Word{value='pjooo', length=5}, guesses=0, feedbacks=[Feedback{attempt='', marks=[CORRECT, ABSENT, ABSENT, ABSENT, ABSENT], hint=[p, ., ., ., .]}]}", round.toString());
+    }
+
+    @Test
+    @DisplayName("checks if round toString is correct")
+    void getLengthWordToGuess() {
+        Round round = new Round(new Word("pjooo"));
+        assertEquals(5, round.getLengthWordToGuess());
+
+        Round round1 = new Round(new Word("pjooooo"));
+        assertEquals(7, round1.getLengthWordToGuess());
     }
 }

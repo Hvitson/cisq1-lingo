@@ -10,16 +10,15 @@ import java.util.List;
 public class Round {
     private final Word wordToGuess;
     private Integer guesses;
-    private final List<Feedback> feedbacks;
+    private List<Feedback> feedbacks;
 
     public Round(Word wordToGuess) {
         this.wordToGuess = wordToGuess;
         guesses = 0;
         feedbacks = new ArrayList<>();
-        feedbacks.add(new Feedback("", wordToGuess, Hint.createFirstHint(wordToGuess)));
+        feedbacks.add(new Feedback("", wordToGuess, Hint.playHint(null, null, wordToGuess)));
     }
 
-    //tests
     public Feedback getLastFeedback() {
         return feedbacks.get(feedbacks.size() - 1);
     }
@@ -43,6 +42,11 @@ public class Round {
             feedbacks.add(newFeedback);
             guesses += 1;
         }
+    }
+
+
+    public Integer getLengthWordToGuess() {
+        return this.wordToGuess.getLength();
     }
 
     public Integer getGuesses() {
