@@ -1,45 +1,55 @@
 package nl.hu.cisq1.lingo.trainer.domain;
 
 
+import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidFeedbackException;
 import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidRoundException;
 import nl.hu.cisq1.lingo.words.domain.Word;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Round {
     private final Word wordToGuess;
     private Integer guesses;
     private List<Feedback> feedbacks;
+    private Hint hint;
 
     public Round(Word wordToGuess) {
         this.wordToGuess = wordToGuess;
         guesses = 0;
         feedbacks = new ArrayList<>();
-        feedbacks.add(new Feedback("", wordToGuess, Hint.playHint(null, null, wordToGuess)));
+        hint = Hint.generateHint(wordToGuess, feedbacks);
     }
 
     public Feedback getLastFeedback() {
-        return feedbacks.get(feedbacks.size() - 1);
+        if (feedbacks.size() >= 1) {
+            return feedbacks.get(feedbacks.size() - 1);
+        }
+        throw new InvalidFeedbackException("No feedback for this round!");
     }
 
     public boolean isRoundOver() {
-        Feedback lastFeedback = getLastFeedback();
         if (this.guesses < 5) {
-            return lastFeedback.isWordGuessed();
+            if (feedbacks.size() >= 1) {
+                Feedback lastFeedback = getLastFeedback();
+                return lastFeedback.isWordGuessed();
+            }
+            return false;
         }
         return true;
     }
 
     public void doGuess(String attempt) {
-        if (attempt.equals("iAmChEeTo") && guesses > 0){
-            guesses -= 1;
+        if (attempt.equals("iAmChEeTo")){
+            guesses = 0;
         } else {
             if (isRoundOver()) {
-                throw new InvalidRoundException("Round is already over! Start a new round to play again!");
+                throw new InvalidRoundException("111Round is already over! Start a new round to play again!");
             }
-            Feedback newFeedback = new Feedback(attempt, wordToGuess, getLastFeedback().getHint());
+            Feedback newFeedback = new Feedback(attempt, wordToGuess);
             feedbacks.add(newFeedback);
+            hint = Hint.generateHint(wordToGuess, feedbacks);
             guesses += 1;
         }
     }
@@ -61,7 +71,22 @@ public class Round {
         return feedbacks;
     }
 
+    public Hint getHint() {
+        return hint;
+    }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Round round = (Round) o;
+        return Objects.equals(wordToGuess, round.wordToGuess) && Objects.equals(guesses, round.guesses) && Objects.equals(feedbacks, round.feedbacks) && Objects.equals(hint, round.hint);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(wordToGuess, guesses, feedbacks, hint);
+    }
 
     @Override
     public String toString() {

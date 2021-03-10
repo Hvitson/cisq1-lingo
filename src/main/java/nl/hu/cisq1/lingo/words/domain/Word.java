@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity(name = "words")
 public class Word {
@@ -35,6 +36,27 @@ public class Word {
         }
 
         return chars;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public void setLength(Integer length) {
+        this.length = length;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Word word = (Word) o;
+        return Objects.equals(value, word.value) && Objects.equals(length, word.length);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value, length);
     }
 
     @Override
