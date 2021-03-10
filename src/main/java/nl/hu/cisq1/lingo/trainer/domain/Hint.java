@@ -2,14 +2,20 @@ package nl.hu.cisq1.lingo.trainer.domain;
 
 import nl.hu.cisq1.lingo.words.domain.Word;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
 import static nl.hu.cisq1.lingo.trainer.domain.Mark.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 public class Hint {
-    private final List<Character> chars;
+    private List<Character> chars;
 
     public Hint(List<Character> chars) {
         this.chars = chars;

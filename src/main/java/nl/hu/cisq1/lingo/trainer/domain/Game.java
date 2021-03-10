@@ -4,19 +4,29 @@ import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidRoundException;
 import nl.hu.cisq1.lingo.words.domain.Word;
 import nl.hu.cisq1.lingo.words.domain.exception.WordLengthNotSupportedException;
 
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
+@Entity(name = "games")
 public class Game {
-    private List<Round> rounds;
+    @Id
+    @GeneratedValue
+    @Column(name = "game_id")
+    private UUID uuid;
     private Integer score;
 
+    @OneToMany(targetEntity = Round.class, cascade = CascadeType.ALL)
+    @JoinColumn(name = "rounds", referencedColumnName = "round_id")
+    private final List<Round> rounds = new ArrayList<>();
+
     public Game() {
-        rounds = new ArrayList<>();
+        uuid = UUID.randomUUID();
+        score = 0;
         //todo: fix via controla
         rounds.add(createRound());
-        score = 0;
     }
 
 //    private void lengthNextWordToGuess() {

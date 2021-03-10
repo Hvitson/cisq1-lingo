@@ -3,18 +3,31 @@ package nl.hu.cisq1.lingo.trainer.domain;
 import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidFeedbackException;
 import nl.hu.cisq1.lingo.words.domain.Word;
 
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 import static nl.hu.cisq1.lingo.trainer.domain.Mark.*;
 
+@Entity(name = "feedbacks")
 public class Feedback {
-    private final String attempt;
-    private final Word wordToGuess;
-    private final List<Mark> marks;
+    @Id
+    @GeneratedValue
+    @Column(name = "feedback_id")
+    private UUID uuid;
+    private String attempt;
+    private Word wordToGuess;
+    private List<Mark> marks;
 
+    @ManyToOne(targetEntity = Round.class, fetch = FetchType.LAZY)
+    @JoinColumn(name = "feedbacks")
+    private Round round;
+
+    public Feedback() {};
     public Feedback(String attempt, Word wordToGuess) {
+        uuid = UUID.randomUUID();
         this.attempt = attempt.toLowerCase();
         this.wordToGuess = wordToGuess;
         marks = createMarks(attempt, this.wordToGuess);
@@ -42,7 +55,7 @@ public class Feedback {
         }
 
         for (int i = 0; i < charactersWordToGuess.size(); i++) {
-            if (charactersAttempt.get(i) == charactersWordToGuess.get(i)) {
+            if (charactersAttempt.get(i).equals(charactersWordToGuess.get(i))) {
                 marks.add(CORRECT);
             } else if (charactersWordToGuess.contains(charactersAttempt.get(i))) {
                 marks.add(PRESENT);

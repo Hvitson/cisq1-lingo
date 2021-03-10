@@ -5,17 +5,34 @@ import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidFeedbackException;
 import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidRoundException;
 import nl.hu.cisq1.lingo.words.domain.Word;
 
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
+@Entity(name = "rounds")
 public class Round {
-    private final Word wordToGuess;
+    @Id
+    @GeneratedValue
+    @Column(name = "round_id")
+    private UUID uuid;
+    private Word wordToGuess;
     private Integer guesses;
+
+    @OneToMany(targetEntity = Feedback.class, cascade = CascadeType.ALL)
+    @JoinColumn(name = "feedbacks", referencedColumnName = "feedback_id")
     private List<Feedback> feedbacks;
+
     private Hint hint;
 
+    @ManyToOne(targetEntity = Game.class, fetch = FetchType.LAZY)
+    @JoinColumn(name = "rounds")
+    private Game game;
+
+    public Round() {}
     public Round(Word wordToGuess) {
+        uuid = UUID.randomUUID();
         this.wordToGuess = wordToGuess;
         guesses = 0;
         feedbacks = new ArrayList<>();
