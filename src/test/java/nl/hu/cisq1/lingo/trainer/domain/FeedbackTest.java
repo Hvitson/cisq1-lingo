@@ -15,32 +15,34 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("Feedback tests")
 class FeedbackTest {
     private Feedback feedbackCorrect, feedbackInvalid, feedbackValid;
+    private String wordToGuess;
 
     @BeforeEach
     void createFeedbacks() {
-        feedbackCorrect = new Feedback("woord", new Word("woord"));
-        feedbackInvalid = new Feedback("we", new Word("woord"));
-        feedbackValid = new Feedback("woort", new Word("woord"));
+        wordToGuess = "woord";
+        feedbackCorrect = new Feedback("woord", wordToGuess);
+        feedbackInvalid = new Feedback("we", wordToGuess);
+        feedbackValid = new Feedback("woort", wordToGuess);
     }
 
     @Test
     @DisplayName("marks created correctly")
     void marksCreatedAbsentAttempt() {
-        List<Mark> marks = Feedback.createMarks("weeee", new Word("woord"));
+        List<Mark> marks = Feedback.createMarks("weeee", wordToGuess);
         assertEquals(List.of(CORRECT, ABSENT, ABSENT, ABSENT, ABSENT), marks);
     }
 
     @Test
     @DisplayName("marks created correctly")
     void marksCreatedWithPresentAttempt() {
-        List<Mark> marks = Feedback.createMarks("wrdoo", new Word("woord"));
+        List<Mark> marks = Feedback.createMarks("wrdoo", wordToGuess);
         assertEquals(List.of(CORRECT, PRESENT, PRESENT, PRESENT, PRESENT), marks);
     }
 
     @Test
     @DisplayName("marks created without attempt")
     void marksCreatedWithoutAttempt() {
-        List<Mark> marks = Feedback.createMarks("", new Word("woord"));
+        List<Mark> marks = Feedback.createMarks("", wordToGuess);
         assertEquals(List.of(INVALID), marks);
     }
 
@@ -49,7 +51,7 @@ class FeedbackTest {
     @Test
     @DisplayName("marks created with wrong attempt")
     void marksCreatedCorrectlyWithWrongAttempt() {
-        List<Mark> marks = Feedback.createMarks("rr", new Word("woord"));
+        List<Mark> marks = Feedback.createMarks("rr", wordToGuess);
         assertEquals(List.of(INVALID, INVALID), marks);
     }
 
@@ -58,7 +60,7 @@ class FeedbackTest {
     void marksCreatedWithAttemptNull() {
         assertThrows(
                 InvalidFeedbackException.class,
-                () -> Feedback.createMarks(null, new Word("woord"))
+                () -> Feedback.createMarks(null, wordToGuess)
         );
     }
 
@@ -102,7 +104,7 @@ class FeedbackTest {
     @Test
     @DisplayName("Feedback hashcode test")
     void feedbackHashCode() {
-        Feedback feedback = new Feedback("woort", new Word("woord"));
+        Feedback feedback = new Feedback("woort", wordToGuess);
         assertEquals(feedback.hashCode(), feedbackValid.hashCode());
     }
 
@@ -118,7 +120,7 @@ class FeedbackTest {
     @Test
     @DisplayName("Feedback equals test")
     void feedbackEquals() {
-        Feedback feedback = new Feedback("woort", new Word("woord"));
+        Feedback feedback = new Feedback("woort", wordToGuess);
         System.out.println(feedbackValid);
         assertTrue(feedback.equals(feedbackValid));
     }
@@ -126,7 +128,7 @@ class FeedbackTest {
     @Test
     @DisplayName("Feedback partially equals test")
     void feedbackPartiallyEqualsAttempt() {
-        Feedback feedback = new Feedback("woors", new Word("woord"));
+        Feedback feedback = new Feedback("woors", wordToGuess);
         System.out.println(feedbackValid);
         assertFalse(feedback.equals(feedbackValid));
     }
@@ -134,7 +136,7 @@ class FeedbackTest {
     @Test
     @DisplayName("Feedback partially equals test")
     void feedbackPartiallyEqualsWord() {
-        Feedback feedback = new Feedback("woort", new Word("woors"));
+        Feedback feedback = new Feedback("woort", "woort");
         System.out.println(feedbackValid);
         assertFalse(feedback.equals(feedbackValid));
     }
@@ -162,7 +164,7 @@ class FeedbackTest {
     @Test
     @DisplayName("feedback toString is created correctly")
     void feedbackToString() {
-        Feedback feedback = new Feedback("woerd", new Word("woord"));
+        Feedback feedback = new Feedback("woerd", wordToGuess);
         System.out.println(feedback);
         assertEquals("Feedback{attempt='woerd', marks=[CORRECT, CORRECT, ABSENT, CORRECT, CORRECT]}", feedback.toString());
     }

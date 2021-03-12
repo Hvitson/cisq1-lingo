@@ -1,22 +1,9 @@
 package nl.hu.cisq1.lingo.words.domain;
 
-import nl.hu.cisq1.lingo.trainer.domain.Feedback;
-import nl.hu.cisq1.lingo.trainer.domain.Round;
-import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidFeedbackException;
-import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidRoundException;
-import nl.hu.cisq1.lingo.words.domain.exception.WordLengthNotSupportedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.List;
-import java.util.stream.Stream;
-
-import static nl.hu.cisq1.lingo.trainer.domain.Mark.ABSENT;
-import static nl.hu.cisq1.lingo.trainer.domain.Mark.CORRECT;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -46,13 +33,6 @@ class WordTest {
     @DisplayName("length is based on given word")
     void valueBasedOnWord() {
         assertEquals("woord", word.getValue());
-    }
-
-    @Test
-    @DisplayName("length is same after toChar()")
-    void wordToCharLength(){
-        List<Character> wordArray = word.wordToChars();
-        assertEquals(word.getLength(), wordArray.size());
     }
 
     //hashcode, equals & toString

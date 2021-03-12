@@ -3,23 +3,40 @@ package nl.hu.cisq1.lingo.trainer.domain;
 
 import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidFeedbackException;
 import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidRoundException;
-import nl.hu.cisq1.lingo.words.domain.Word;
 
+import javax.persistence.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
-public class Round {
-    private final Word wordToGuess;
+@Entity(name = "rounds")
+public class Round implements Serializable {
+    @Id
+    @GeneratedValue
+    private UUID round_id;
+    private String wordToGuess;
     private Integer guesses;
-    private List<Feedback> feedbacks;
-    private Hint hint;
 
-    public Round(Word wordToGuess) {
+    @OneToMany(targetEntity = Feedback.class, cascade = CascadeType.ALL)
+    @JoinColumn(name = "round_feedbacks")
+    private List<Feedback> feedbacks;
+
+    @Lob
+    private List<Character> hint;
+
+    @ManyToOne(targetEntity = Game.class, fetch = FetchType.LAZY)
+    @JoinColumn(name = "game_rounds")
+    private Game game;
+    //state toevoegen
+
+    public Round() {}
+    public Round(String wordToGuess) {
         this.wordToGuess = wordToGuess;
         guesses = 0;
         feedbacks = new ArrayList<>();
-        hint = Hint.generateHint(wordToGuess, feedbacks);
+        hint = Hint.generateHint(wordToGuess, feedbacks).getChars();
     }
 
     public Feedback getLastFeedback() {
@@ -49,14 +66,14 @@ public class Round {
             }
             Feedback newFeedback = new Feedback(attempt, wordToGuess);
             feedbacks.add(newFeedback);
-            hint = Hint.generateHint(wordToGuess, feedbacks);
+            hint = Hint.generateHint(wordToGuess, feedbacks).getChars();
             guesses += 1;
         }
     }
 
 
     public Integer getLengthWordToGuess() {
-        return this.wordToGuess.getLength();
+        return this.wordToGuess.length();
     }
 
     public Integer getGuesses() {
@@ -71,7 +88,7 @@ public class Round {
         return feedbacks;
     }
 
-    public Hint getHint() {
+    public List<Character> getHint() {
         return hint;
     }
 
@@ -80,7 +97,16 @@ public class Round {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Round round = (Round) o;
-        return Objects.equals(wordToGuess, round.wordToGuess) && Objects.equals(guesses, round.guesses) && Objects.equals(feedbacks, round.feedbacks) && Objects.equals(hint, round.hint);
+        if (Objects.equals(wordToGuess, round.wordToGuess)) {
+            if (Objects.equals(guesses, round.guesses)) {
+                if (Objects.equals(feedbacks, round.feedbacks)) {
+                    if (Objects.equals(hint, round.hint)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     @Override

@@ -1,23 +1,30 @@
 package nl.hu.cisq1.lingo.trainer.domain;
 
-import nl.hu.cisq1.lingo.words.domain.Word;
+import javax.persistence.Embeddable;
+import javax.persistence.Embedded;
 
 import static nl.hu.cisq1.lingo.trainer.domain.Mark.*;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Hint {
-    private final List<Character> chars;
+public class Hint implements Serializable {
+    private List<Character> chars;
 
+    public Hint() {}
     public Hint(List<Character> chars) {
         this.chars = chars;
     }
 
-    public static Hint generateHint(Word wordToGuess, List<Feedback> feedbacks) {
+    public static Hint generateHint(String wordToGuess, List<Feedback> feedbacks) {
         List<Character> chars = new ArrayList<>();
-        List<Character> charsWordToGuess = wordToGuess.wordToChars();
+        List<Character> charsWordToGuess = new ArrayList<>();
+
+        for (Character character : wordToGuess.toCharArray()) {
+            charsWordToGuess.add(character);
+        }
 
         chars.add(charsWordToGuess.get(0));
         for (int i = 1; i < charsWordToGuess.size(); i++) {
@@ -35,6 +42,7 @@ public class Hint {
         }
         return new Hint(chars);
     }
+
 
     public List<Character> getChars() {
         return chars;

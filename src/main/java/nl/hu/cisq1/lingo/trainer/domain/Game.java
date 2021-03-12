@@ -1,43 +1,47 @@
 package nl.hu.cisq1.lingo.trainer.domain;
 
 import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidRoundException;
-import nl.hu.cisq1.lingo.words.domain.Word;
 import nl.hu.cisq1.lingo.words.domain.exception.WordLengthNotSupportedException;
 
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
+@Entity(name = "games")
 public class Game {
-    private List<Round> rounds;
+    @Id
+    @GeneratedValue
+    private UUID game_id;
     private Integer score;
 
+    @OneToMany(targetEntity = Round.class, cascade = CascadeType.ALL)
+    @JoinColumn(name = "game_rounds")
+    private final List<Round> rounds = new ArrayList<>();
+
     public Game() {
-        rounds = new ArrayList<>();
-        //todo: fix via controla
-        rounds.add(createRound());
         score = 0;
     }
 
-//    private void lengthNextWordToGuess() {
-//        if (getLastRound().isRoundOver()) {
-//            Integer numba = this.getLastRound().getLengthWordToGuess();
-//           if (numba == 5) {
-//               //maak wordToGuess met 6 letters
-//               createRound();
-//           } else if (numba == 6) {
-//               //maak wordToGuess met 7 letters
-//               createRound();
-//           } else if (numba == 7) {
-//               //maak wordToGuess met 5 letters
-//               createRound();
-//           } else {
-//               throw new WordLengthNotSupportedException(numba);
-//           }
-//        } else {
-//            throw new InvalidRoundException("finish your last round before you start a new one!");
-//        }
-//    }
+    public Integer lengthNextWordToGuess() {
+        if (getLastRound().isRoundOver()) {
+            Integer numba = this.getLastRound().getLengthWordToGuess();
+            if (numba == 0) {
+                return 5;
+            } else if (numba == 5) {
+                return 6;
+            } else if (numba == 6) {
+                return 7;
+           } else if (numba == 7) {
+                return 5;
+           } else {
+               throw new InvalidRoundException("Length not supported");
+           }
+        } else {
+            throw new InvalidRoundException("finish your last round before you start a new one!");
+        }
+    }
 
     //todo: testen? al 280572 keer getest b4
     private boolean isRoundOver() {
@@ -52,21 +56,16 @@ public class Game {
         this.score = score;
     }
 
-    //todo: fix via controla
-    public Round createRound() {
-        //new Word vervangen door functie aan de hand van lengte volgende word zijn lengte bepaalt en ophaalt
-        return new Round(new Word("wonen"));
-    }
-
-    public void startRound() {
+    public void createRound(String wordToGuess) {
+        if (rounds.isEmpty()) {
+            rounds.add(new Round(wordToGuess));
+        }
         if (isRoundOver()) {
-            rounds.add(createRound());
+            rounds.add(new Round(wordToGuess));
         } else {
             throw new InvalidRoundException("finish your last round before you start a new one!");
         }
     }
-
-    //game guess?
 
     public List<Round> getRounds() {
         return rounds;

@@ -28,16 +28,6 @@ public class Word {
         return length;
     }
 
-    public List<Character> wordToChars() {
-        List<Character> chars = new ArrayList<>();
-
-        for (Character character : this.value.toCharArray()) {
-            chars.add(character);
-        }
-
-        return chars;
-    }
-
     public void setValue(String value) {
         this.value = value;
     }

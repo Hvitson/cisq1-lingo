@@ -1,6 +1,5 @@
 package nl.hu.cisq1.lingo.trainer.domain;
 
-import nl.hu.cisq1.lingo.words.domain.Word;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,10 +11,11 @@ import static org.junit.jupiter.api.Assertions.*;
 public class HintTest {
     private Hint hintWith;
     private Hint hintWithout;
+    private String wordToGuess;
 
     @BeforeEach
     void createHints() {
-        Word wordToGuess = new Word("wonen");
+        wordToGuess = "wonen";
         hintWithout = Hint.generateHint(wordToGuess, List.of());
         hintWith = Hint.generateHint(wordToGuess, List.of(
                 new Feedback("weeee", wordToGuess),
@@ -27,13 +27,13 @@ public class HintTest {
     @Test
     @DisplayName("Hint is created correctly without feedback")
     void hintCreatedWithoutFeedback() {
-        assertEquals(List.of('w','.','.','.','.'), hintWithout.getChars());
+        assertEquals(List.of('w','.','.','.','.'), hintWithout);
     }
 
     @Test
     @DisplayName("Hint is created correctly with feedback")
     void hintCreatedWithFeedback() {
-        assertEquals(List.of('w','.','.','e','n'), hintWith.getChars());
+        assertEquals(List.of('w','.','.','e','n'), hintWith);
     }
 
     @Test
@@ -88,9 +88,9 @@ public class HintTest {
     @Test
     @DisplayName("Hint partially equals test")
     void hintPartiallyEqualsHint() {
-        Hint hintCheck = Hint.generateHint(new Word("wonen"), List.of(
-                new Feedback("weeee", new Word("woord")),
-                new Feedback("woeon", new Word("woord"))
+        Hint hintCheck = Hint.generateHint(wordToGuess, List.of(
+                new Feedback("weeee", "woord"),
+                new Feedback("woeon", "woord")
         ));
         assertFalse(hintWith.equals(hintCheck));
     }
