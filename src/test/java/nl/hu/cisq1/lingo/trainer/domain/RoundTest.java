@@ -2,7 +2,6 @@ package nl.hu.cisq1.lingo.trainer.domain;
 
 import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidFeedbackException;
 import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidRoundException;
-import nl.hu.cisq1.lingo.words.domain.Word;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,19 +17,19 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class RoundTest {
     private Round round;
-    private Word wordToGuess;
+    private String wordToGuess;
 
     @BeforeEach
     void beginRound() {
-        wordToGuess = new Word("wonen");
+        wordToGuess = "wonen";
         round = new Round(wordToGuess);
     }
 
     @Test
     @DisplayName("check if round is created it also creates correct hint")
     void creatingHintForRound() {
-        Hint hint = round.getHint();
-        assertEquals(List.of('w','.','.','.','.'), hint.getChars());
+        List<Character> hint = round.getHint();
+        assertEquals(List.of('w','.','.','.','.'), hint);
     }
 
     @Test
@@ -43,7 +42,7 @@ public class RoundTest {
     @Test
     @DisplayName("check if round is created it also creates correct hint")
     void creatingRoundCreatesCorrectHint() {
-        assertEquals(List.of('w','.','.','.','.'), round.getHint().getChars());
+        assertEquals(List.of('w','.','.','.','.'), round.getHint());
 
     }
 
@@ -140,7 +139,7 @@ public class RoundTest {
         round.doGuess("schon");
 
         assertEquals(List.of(ABSENT, ABSENT, ABSENT, PRESENT, CORRECT), round.getLastFeedback().getMarks());
-        assertEquals(List.of('w','.','.','.','n'), round.getHint().getChars());
+        assertEquals(List.of('w','.','.','.','n'), round.getHint());
         assertEquals(1, round.getGuesses());
     }
 
@@ -181,9 +180,9 @@ public class RoundTest {
 
     private static Stream<Arguments> provideRoundOverExamples() {
         return Stream.of(
-                Arguments.of(new Round(new Word("wonen")), 1, new Feedback("wonen", new Word("wonen"))),
-                Arguments.of(new Round(new Word("wonen")), 5, new Feedback("fg", new Word("wonen"))),
-                Arguments.of(new Round(new Word("wonen")), 6, new Feedback("fg", new Word("wonen")))
+                Arguments.of(new Round("wonen"), 1, new Feedback("wonen", "wonen")),
+                Arguments.of(new Round("wonen"), 5, new Feedback("fg", "wonen")),
+                Arguments.of(new Round("wonen"), 6, new Feedback("fg", "wonen"))
         );
     }
 
@@ -203,10 +202,10 @@ public class RoundTest {
     @Test
     @DisplayName("checks if round toString is correct")
     void getLengthWordToGuess() {
-        Round round = new Round(new Word("pjooo"));
+        Round round = new Round("pjooo");
         assertEquals(5, round.getLengthWordToGuess());
 
-        Round round1 = new Round(new Word("pjooooo"));
+        Round round1 = new Round("pjooooo");
         assertEquals(7, round1.getLengthWordToGuess());
     }
 
@@ -237,14 +236,14 @@ public class RoundTest {
     @Test
     @DisplayName("Round partially equals test -> wordToGuess different")
     void roundPartiallyEqualsRound() {
-        Round roundCheck = new Round(new Word("wooon"));
+        Round roundCheck = new Round("wooon");
         assertFalse(round.equals(roundCheck));
     }
 
     @Test
     @DisplayName("Round partially equals test -> guesses different")
     void roundPartiallyEqualsRoundGuesses() {
-        Round roundCheck = new Round(new Word("wonen"));
+        Round roundCheck = new Round("wonen");
         roundCheck.setGuesses(3);
         assertFalse(round.equals(roundCheck));
     }
@@ -252,15 +251,15 @@ public class RoundTest {
     @Test
     @DisplayName("Round partially equals test -> feedbacks different")
     void roundPartiallyEqualsRoundFeedbacks() {
-        Round roundCheck = new Round(new Word("wooon"));
-        roundCheck.getFeedbacks().add(new Feedback("woerd", new Word("woord")));
+        Round roundCheck = new Round("wooon");
+        roundCheck.getFeedbacks().add(new Feedback("woerd", "woord"));
         assertFalse(round.equals(roundCheck));
     }
 
     @Test
     @DisplayName("Round partially equals test -> hint different")
     void roundPartiallyEqualsRoundHint() {
-        Round roundCheck = new Round(new Word("wooon"));
+        Round roundCheck = new Round("wooon");
         roundCheck.doGuess("woeee");
         roundCheck.getFeedbacks().remove(roundCheck.getLastFeedback());
         roundCheck.doGuess("iAmChEeTo");
@@ -278,8 +277,8 @@ public class RoundTest {
     @DisplayName("Round equals different type list test")
     void hintNotEqualsDifferentType() {
         assertFalse(round.equals(List.of(wordToGuess, 0, List.of(
-                new Feedback("we", new Word("woord")),
-                new Feedback("woort", new Word("woord"))
+                new Feedback("we", "woord"),
+                new Feedback("woort", "woord")
                 ))));
     }
 
@@ -293,6 +292,6 @@ public class RoundTest {
     @Test
     @DisplayName("Round toString is created correctly")
     void roundToString() {
-        assertEquals("Round{wordToGuess=Word{value='wonen', length=5}, guesses=0, feedbacks=[]}", round.toString());
+        assertEquals("Round{wordToGuess=wonen, guesses=0, feedbacks=[]}", round.toString());
     }
 }
