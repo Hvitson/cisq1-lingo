@@ -13,7 +13,6 @@ import java.util.Objects;
 public class Hint implements Serializable {
     private List<Character> chars;
 
-    public Hint() {}
     public Hint(List<Character> chars) {
         this.chars = chars;
     }
