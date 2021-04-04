@@ -17,7 +17,7 @@ import static nl.hu.cisq1.lingo.trainer.domain.state.StateGame.*;
 import static org.mockito.Mockito.*;
 
 
-public class GameTest {
+class GameTest {
     private Game game;
     private String wordToGuess;
 
@@ -31,7 +31,7 @@ public class GameTest {
     @DisplayName("test game constructor")
     void gameConstructor() {
         assertEquals(new Game(), game);
-        assertEquals(null, game.getGameId());
+        assertNull(game.getGameId());
         assertEquals(0, game.getPlayingRoundNumber());
         assertEquals(0, game.getScore());
         assertEquals(WAITING_FOR_ROUND, game.getState());
@@ -252,7 +252,7 @@ public class GameTest {
     @DisplayName("Game hashcode 0 test")
     void feedbackHashCode0() {
         if (game.hashCode() == 0) {
-            assertFalse(true);
+            fail();
         }
         assertFalse(false);
     }

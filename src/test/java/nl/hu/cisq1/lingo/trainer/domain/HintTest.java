@@ -8,7 +8,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class HintTest {
+class HintTest {
     private Hint hintWith;
     private Hint hintWithout;
     private String wordToGuess;
@@ -49,10 +49,10 @@ public class HintTest {
     @DisplayName("Hint hashcode 0 test")
     void hintHashCode0() {
         if (hintWith.hashCode() == 0) {
-            assertFalse(true);
+            fail();
         }
         if (hintWithout.hashCode() == 0) {
-            assertFalse(true);
+            fail();
         }
         assertFalse(false);
     }

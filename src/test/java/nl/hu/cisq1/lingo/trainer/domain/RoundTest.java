@@ -17,7 +17,7 @@ import static nl.hu.cisq1.lingo.trainer.domain.Mark.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static nl.hu.cisq1.lingo.trainer.domain.state.StateRound.*;
 
-public class RoundTest {
+class RoundTest {
     private Round round;
     private String wordToGuess;
 
@@ -31,10 +31,10 @@ public class RoundTest {
     @DisplayName("Create empty Round")
     void createEmptyFeedback() {
         Round emptyRound = new Round();
-        assertEquals(null, emptyRound.getRoundId());
-        assertEquals(null, emptyRound.getWordToGuess());
-        assertEquals(null, emptyRound.getGuesses());
-        assertEquals(null, emptyRound.getFeedbacks());
+        assertNull(emptyRound.getRoundId());
+        assertNull(emptyRound.getWordToGuess());
+        assertNull(emptyRound.getGuesses());
+        assertNull(emptyRound.getFeedbacks());
     }
 
     @Test
@@ -47,9 +47,9 @@ public class RoundTest {
     @Test
     @DisplayName("check if StateRound is 'WAITING_FOR_INPUT' after round is created")
     void roundIsPlayable() {
-        assertTrue(round.getState() == WAITING_FOR_INPUT);
-        assertTrue(round.getState() != WON);
-        assertTrue(round.getState() != LOST);
+        assertSame(round.getState(), WAITING_FOR_INPUT);
+        assertNotSame(round.getState(), WON);
+        assertNotSame(round.getState(), LOST);
     }
 
     @Test
@@ -57,9 +57,9 @@ public class RoundTest {
     void roundIsPlayableAfterGuessesingLessThanFiveTimes() {
         round.doGuess("jooow");
         assertEquals(1, round.getGuesses());
-        assertTrue(round.getState() == WAITING_FOR_INPUT);
-        assertTrue(round.getState() != WON);
-        assertTrue(round.getState() != LOST);
+        assertSame(round.getState(), WAITING_FOR_INPUT);
+        assertNotSame(round.getState(), WON);
+        assertNotSame(round.getState(), LOST);
     }
 
     //check if also after guess
@@ -248,7 +248,7 @@ public class RoundTest {
     @DisplayName("Round hashcode 0 test")
     void roundHashCode0() {
         if (round.hashCode() == 0) {
-            assertFalse(true);
+            fail();
         }
         assertFalse(false);
     }

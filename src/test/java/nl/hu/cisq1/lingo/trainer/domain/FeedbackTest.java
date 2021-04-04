@@ -30,8 +30,8 @@ class FeedbackTest {
     @DisplayName("Create empty Feedback")
     void createEmptyFeedback() {
         Feedback emptyFeedback = new Feedback();
-        assertEquals(null, emptyFeedback.getAttempt());
-        assertEquals(null, emptyFeedback.getMarks());
+        assertNull(emptyFeedback.getAttempt());
+        assertNull(emptyFeedback.getMarks());
     }
 
     @Test
@@ -95,7 +95,7 @@ class FeedbackTest {
     @DisplayName("gets list marks from feedback")
     void getFeedbackId() {
         System.out.println(feedbackCorrect.getFeedbackId());
-        assertEquals(null, feedbackCorrect.getFeedbackId());
+        assertNull(feedbackCorrect.getFeedbackId());
     }
 
     @Test
@@ -153,7 +153,7 @@ class FeedbackTest {
     @DisplayName("Feedback hashcode 0 test")
     void feedbackHashCode0() {
         if (feedbackValid.hashCode() == 0) {
-            assertFalse(true);
+            fail();
         }
         assertFalse(false);
     }
