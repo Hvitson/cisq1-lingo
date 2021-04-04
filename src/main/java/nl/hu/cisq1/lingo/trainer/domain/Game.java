@@ -1,74 +1,107 @@
 package nl.hu.cisq1.lingo.trainer.domain;
 
 import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidRoundException;
-import nl.hu.cisq1.lingo.words.domain.exception.WordLengthNotSupportedException;
+import nl.hu.cisq1.lingo.trainer.domain.state.StateGame;
+import nl.hu.cisq1.lingo.trainer.domain.state.StateRound;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
+
+import static nl.hu.cisq1.lingo.trainer.domain.state.StateGame.*;
+import static nl.hu.cisq1.lingo.trainer.domain.state.StateRound.*;
 
 @Entity(name = "games")
-public class Game {
+public class Game implements Serializable {
     @Id
     @GeneratedValue
-    private UUID game_id;
+    private Long gameId;
+    private Integer playingRoundNumber;
     private Integer score;
+    private StateGame state;
 
-    @OneToMany(targetEntity = Round.class, cascade = CascadeType.ALL)
-    @JoinColumn(name = "game_rounds")
+    @OneToMany(cascade = CascadeType.ALL)
     private final List<Round> rounds = new ArrayList<>();
 
     public Game() {
-        score = 0;
+        this.playingRoundNumber = 0;
+        this.state = WAITING_FOR_ROUND;
+        this.score = 0;
     }
+
 
     public Integer lengthNextWordToGuess() {
-        if (getLastRound().isRoundOver()) {
-            Integer numba = this.getLastRound().getLengthWordToGuess();
-            if (numba == 0) {
-                return 5;
-            } else if (numba == 5) {
-                return 6;
-            } else if (numba == 6) {
-                return 7;
-           } else if (numba == 7) {
-                return 5;
-           } else {
-               throw new InvalidRoundException("Length not supported");
-           }
+        Integer numba = this.getLastRound().getLengthWordToGuess();
+        if (numba == 5) {
+            return 6;
+        } else if (numba == 6) {
+            return 7;
+        } else if (numba == 7) {
+            return 5;
         } else {
-            throw new InvalidRoundException("finish your last round before you start a new one!");
+            throw new InvalidRoundException("Length not supported");
         }
-    }
-
-    //todo: testen? al 280572 keer getest b4
-    private boolean isRoundOver() {
-        return this.getLastRound().isRoundOver();
     }
 
     public Round getLastRound() {
             return rounds.get(rounds.size() - 1);
     }
 
-    public void setScore(Integer score) {
-        this.score = score;
-    }
-
-    public void createRound(String wordToGuess) {
-        if (rounds.isEmpty()) {
+    public void createRound(String wordToGuess) throws InvalidRoundException {
+        if (rounds.isEmpty() && this.state == WAITING_FOR_ROUND) {
             rounds.add(new Round(wordToGuess));
-        }
-        if (isRoundOver()) {
+            playingRoundNumber += 1;
+            state = PLAYING_ROUND;
+        } else if (getLastRound().getState() != WAITING_FOR_INPUT) {
             rounds.add(new Round(wordToGuess));
+            playingRoundNumber += 1;
+            state = PLAYING_ROUND;
         } else {
             throw new InvalidRoundException("finish your last round before you start a new one!");
         }
     }
 
+    public void doGuess(String attempt) throws InvalidRoundException {
+        Round currentRound = getLastRound();
+        if (currentRound.getState() == WAITING_FOR_INPUT) {
+            currentRound.doGuess(attempt);
+            if (currentRound.getState() != WAITING_FOR_INPUT) {
+                score += calculateScore(currentRound.getGuesses());
+                state = WAITING_FOR_ROUND;
+            }
+        } else {
+            throw new InvalidRoundException("Round already over, start a new round!");
+        }
+    }
+
+    public Integer calculateScore(Integer guesses) {
+        return (5 * ( 5 - guesses )) + 5;
+    }
+
+    public Long getGameId() {
+        return gameId;
+    }
+
+    public Integer getPlayingRoundNumber() {
+        return playingRoundNumber;
+    }
+
+    public Integer getScore() {
+        return score;
+    }
+
+    public StateGame getState() {
+        return state;
+    }
+
     public List<Round> getRounds() {
         return rounds;
+    }
+
+    public void setScore(Integer score) {
+        this.score = score;
     }
 
     @Override

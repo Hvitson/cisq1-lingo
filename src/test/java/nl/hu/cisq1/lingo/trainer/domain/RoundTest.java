@@ -2,6 +2,7 @@ package nl.hu.cisq1.lingo.trainer.domain;
 
 import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidFeedbackException;
 import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidRoundException;
+import nl.hu.cisq1.lingo.trainer.domain.state.StateRound;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ import java.util.stream.Stream;
 
 import static nl.hu.cisq1.lingo.trainer.domain.Mark.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static nl.hu.cisq1.lingo.trainer.domain.state.StateRound.*;
 
 public class RoundTest {
     private Round round;
@@ -26,6 +28,16 @@ public class RoundTest {
     }
 
     @Test
+    @DisplayName("Create empty Round")
+    void createEmptyFeedback() {
+        Round emptyRound = new Round();
+        assertEquals(null, emptyRound.getRoundId());
+        assertEquals(null, emptyRound.getWordToGuess());
+        assertEquals(null, emptyRound.getGuesses());
+        assertEquals(null, emptyRound.getFeedbacks());
+    }
+
+    @Test
     @DisplayName("check if round is created it also creates correct hint")
     void creatingHintForRound() {
         List<Character> hint = round.getHint();
@@ -33,9 +45,21 @@ public class RoundTest {
     }
 
     @Test
-    @DisplayName("check if round is not still playable")
+    @DisplayName("check if StateRound is 'WAITING_FOR_INPUT' after round is created")
     void roundIsPlayable() {
-        assertFalse(round.isRoundOver());
+        assertTrue(round.getState() == WAITING_FOR_INPUT);
+        assertTrue(round.getState() != WON);
+        assertTrue(round.getState() != LOST);
+    }
+
+    @Test
+    @DisplayName("check if StateRound is 'WAITING_FOR_INPUT' after word not guessed en guesses are lower than 5")
+    void roundIsPlayableAfterGuessesingLessThanFiveTimes() {
+        round.doGuess("jooow");
+        assertEquals(1, round.getGuesses());
+        assertTrue(round.getState() == WAITING_FOR_INPUT);
+        assertTrue(round.getState() != WON);
+        assertTrue(round.getState() != LOST);
     }
 
     //check if also after guess
@@ -47,38 +71,40 @@ public class RoundTest {
     }
 
     @Test
-    @DisplayName("check if round is over after guessing 5 times")
+    @DisplayName("check if StateRound changes to LOST after guessing 5 times")
     void RoundIsOverTooManyGuesses() {
         round.doGuess("wonee");
         round.doGuess("wonee");
         round.doGuess("wonee");
         round.doGuess("wonee");
         round.doGuess("wonee");
-        assertTrue(round.isRoundOver());
+        assertTrue(round.getState() == LOST);
+        assertTrue(round.getState() != WAITING_FOR_INPUT);
+        assertTrue(round.getState() != WON);
     }
 
     @Test
-    @DisplayName("test getLastFeedback when feedbacks bigger then 0")
+    @DisplayName("check if StateRound changes to WON after guessing the word")
+    void RoundIsOverIfGuessedCorrect() {
+        round.doGuess("wonen");
+        assertTrue(round.getState() == WON);
+        assertTrue(round.getState() != WAITING_FOR_INPUT);
+        assertTrue(round.getState() != LOST);
+    }
+
+    @Test
+    @DisplayName("test getLastFeedback when feedbacks bigger than 0")
     void roundGetLastFeedbackWhenContains() {
         round.doGuess("hallo");
         assertEquals(new Feedback("hallo", wordToGuess), round.getLastFeedback());
     }
 
     @Test
-    @DisplayName("test getLastFeedback when feedbacks size is 0 throws exception")
-    void roundGetLastFeedbackWhenEmpty() {
-        assertThrows(
-                InvalidFeedbackException.class,
-                () -> round.getLastFeedback()
-        );
-    }
-
-    //nadat doGuess toegevoegd
-    @Test
-    @DisplayName("check if round is over after guessing the wordToGuess")
-    void RoundIsOverIfGuessedCorrect() {
-        round.doGuess("wonen");
-        assertTrue(round.isRoundOver());
+    @DisplayName("test getLastFeedback throws exception when list is empty, 0 or null")
+    void roundGetLastFeedbackThrowsException() {
+        Round round = new Round("Wonen");
+        System.out.println(round.getFeedbacks());
+        assertThrows(InvalidFeedbackException.class, () -> round.getLastFeedback());
     }
 
     @Test
@@ -109,7 +135,7 @@ public class RoundTest {
         round.doGuess("wonee");
         round.doGuess("weeee");
         round.doGuess("1");
-        assertEquals(new Hint(List.of('w', 'o', 'n', 'e', '.')), round.getHint());
+        assertEquals(List.of('w', 'o', 'n', 'e', '.'), round.getHint());
     }
 
     @Test
@@ -153,7 +179,7 @@ public class RoundTest {
         System.out.println(round);
 
         assertEquals(List.of(INVALID), round.getLastFeedback().getMarks());
-        assertEquals(new Hint(List.of('w','o','.','e','.')), round.getHint());
+        assertEquals(List.of('w','o','.','e','.'), round.getHint());
         assertEquals(2, round.getGuesses());
     }
 
@@ -162,27 +188,26 @@ public class RoundTest {
     void doGuessWithInvalidGuess() {
         round.doGuess("df");
 
-        assertEquals(List.of(INVALID, INVALID), round.getLastFeedback().getMarks());
-        assertEquals(new Hint(List.of('w','.','.','.','.')), round.getHint());
+        assertEquals(List.of(INVALID), round.getLastFeedback().getMarks());
+        assertEquals(List.of('w','.','.','.','.'), round.getHint());
         assertEquals(1, round.getGuesses());
     }
 
     @Test
-    @DisplayName("checking if cheeto worky")
-    void cheetoWorky() {
-        round.doGuess("worrr");
-        Feedback feedbackVoorCheetoGuess = round.getLastFeedback();
-        round.doGuess("iAmChEeTo");
-        System.out.println(round.toString());
-        assertEquals(0, round.getGuesses());
-        assertEquals(new Hint(List.of('w','o','.','.','.')), round.getHint());
+    @DisplayName("Testing geuss on a round with too long guess")
+    void doGuessWithTooLongGuess() {
+        round.doGuess("dfffffff");
+
+        assertEquals(List.of(INVALID), round.getLastFeedback().getMarks());
+        assertEquals(List.of('w','.','.','.','.'), round.getHint());
+        assertEquals(1, round.getGuesses());
     }
 
     private static Stream<Arguments> provideRoundOverExamples() {
         return Stream.of(
-                Arguments.of(new Round("wonen"), 1, new Feedback("wonen", "wonen")),
-                Arguments.of(new Round("wonen"), 5, new Feedback("fg", "wonen")),
-                Arguments.of(new Round("wonen"), 6, new Feedback("fg", "wonen"))
+                Arguments.of(new Round("wonen"), 1, WON, new Feedback("wonen", "wonen")),
+                Arguments.of(new Round("wonen"), 5, LOST, new Feedback("fg", "wonen")),
+                Arguments.of(new Round("wonen"), 6, LOST, new Feedback("fg", "wonen"))
         );
     }
 
@@ -190,9 +215,11 @@ public class RoundTest {
     @ParameterizedTest
     @MethodSource("provideRoundOverExamples")
     @DisplayName("Testing geuss on a round that is not playable")
-    void doGuessWhenRoundIsOver(Round round, Integer guesses, Feedback feedback) {
+    void doGuessWhenRoundIsOver(Round round, Integer guesses, StateRound state, Feedback feedback) {
         round.setGuesses(guesses);
         round.getFeedbacks().add(feedback);
+        round.setState(state);
+        System.out.println(round);
         assertThrows(
                 InvalidRoundException.class,
                 () -> round.doGuess("bababooey")

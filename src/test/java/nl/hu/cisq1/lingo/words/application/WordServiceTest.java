@@ -16,14 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-/**
- * This is a unit test.
- *
- * It tests the behaviors of our system under test,
- * WordService, in complete isolation:
- * - its methods are called by the test framework instead of a controller
- * - the WordService calls a test double instead of an actual repository
- */
+
 class WordServiceTest {
 
     @ParameterizedTest

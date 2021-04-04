@@ -6,46 +6,60 @@ import nl.hu.cisq1.lingo.trainer.data.SpringGameRepository;
 import nl.hu.cisq1.lingo.trainer.domain.Game;
 import nl.hu.cisq1.lingo.trainer.domain.Round;
 import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidGameException;
+import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidRoundException;
+import nl.hu.cisq1.lingo.words.application.WordService;
 import nl.hu.cisq1.lingo.words.data.SpringWordRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
+import javax.transaction.Transactional;
+import java.util.List;
+import java.util.Optional;
 
 @Service
+@Transactional
 public class TrainerService {
     private final SpringGameRepository gameRepository;
-    private final SpringWordRepository wordRepository;
+    private final WordService wordService;
 
-    public TrainerService(SpringGameRepository gameRepository, SpringWordRepository wordRepository) {
+    public TrainerService(SpringGameRepository gameRepository, WordService wordService) {
         this.gameRepository = gameRepository;
-        this.wordRepository = wordRepository;
+        this.wordService = wordService;
     }
 
-    public Game FindGame(UUID id) {
-        return gameRepository.findByGame_id(id).orElseThrow(() -> new InvalidGameException("Game with id "+ id +" not found"));
+    public List<Game> getAllGames() {
+        return gameRepository.findAll();
     }
 
-    public Round startGame() {
+    public Game findGame(Long id) throws InvalidGameException {
+        return gameRepository.findGameByGameId(id).orElseThrow(() -> new InvalidGameException("Game with id " + id + " not found"));
+    }
+
+    public Game startGame() {
         Game game = new Game();
-        game.createRound(wordRepository.findRandomWordByLength(5).get().getValue());
+        game.createRound(wordService.provideRandomWord(5));
 
-        return game.getLastRound();
+        gameRepository.save(game);
+
+        return game;
     }
 
-    public Round doGuess(UUID id,String attempt) {
-        Game game = FindGame(id);
-        Round round = game.getLastRound();
-        round.doGuess(attempt);
 
-        return game.getLastRound();
-    }
-
-    public Round startGameRound(UUID id) {
-        Game game = FindGame(id);
+    public Game startRound(Long id) throws InvalidRoundException {
+        Game game = findGame(id);
         Integer lengthNextWord = game.lengthNextWordToGuess();
-        game.createRound(wordRepository.findRandomWordByLength(lengthNextWord).get().getValue());
+        game.createRound(wordService.provideRandomWord(lengthNextWord));
 
-        return game.getLastRound();
+        gameRepository.save(game);
+
+        return game;
     }
 
+    public Game doGuess(Long id, String attempt) {
+        Game game = findGame(id);
+        game.doGuess(attempt);
+
+        gameRepository.save(game);
+
+        return game;
+    }
 }

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @DisplayName("Feedback tests")
 class FeedbackTest {
@@ -26,6 +27,14 @@ class FeedbackTest {
     }
 
     @Test
+    @DisplayName("Create empty Feedback")
+    void createEmptyFeedback() {
+        Feedback emptyFeedback = new Feedback();
+        assertEquals(null, emptyFeedback.getAttempt());
+        assertEquals(null, emptyFeedback.getMarks());
+    }
+
+    @Test
     @DisplayName("marks created correctly")
     void marksCreatedAbsentAttempt() {
         List<Mark> marks = Feedback.createMarks("weeee", wordToGuess);
@@ -33,10 +42,19 @@ class FeedbackTest {
     }
 
     @Test
-    @DisplayName("marks created correctly")
+    @DisplayName("marks created correctly when attempt has letter twice but only exists once in wordToGuess")
     void marksCreatedWithPresentAttempt() {
-        List<Mark> marks = Feedback.createMarks("wrdoo", wordToGuess);
-        assertEquals(List.of(CORRECT, PRESENT, PRESENT, PRESENT, PRESENT), marks);
+        List<Mark> marks = Feedback.createMarks("wrodd", wordToGuess);
+        System.out.println(wordToGuess);
+        assertEquals(List.of(CORRECT, PRESENT, CORRECT, ABSENT, CORRECT), marks);
+    }
+
+    @Test
+    @DisplayName("marks returns ABSENT when attempt contains more of a letter than wordToGuess")
+    void marksSetsValueAbsent() {
+        List<Mark> marks = Feedback.createMarks("wrooo", wordToGuess);
+        System.out.println(wordToGuess);
+        assertEquals(List.of(CORRECT, PRESENT, CORRECT, PRESENT, ABSENT), marks);
     }
 
     @Test
@@ -46,13 +64,11 @@ class FeedbackTest {
         assertEquals(List.of(INVALID), marks);
     }
 
-
-
     @Test
     @DisplayName("marks created with wrong attempt")
     void marksCreatedCorrectlyWithWrongAttempt() {
         List<Mark> marks = Feedback.createMarks("rr", wordToGuess);
-        assertEquals(List.of(INVALID, INVALID), marks);
+        assertEquals(List.of(INVALID), marks);
     }
 
     @Test
@@ -65,6 +81,31 @@ class FeedbackTest {
     }
 
     @Test
+    @DisplayName("get feedback attributes")
+    void feedbackMock() {
+        Feedback feedback = mock(Feedback.class);
+        when(feedback.getFeedbackId()).thenReturn(1L);
+        when(feedback.getWordToGuess()).thenReturn("wonen");
+
+        assertEquals(1L, feedback.getFeedbackId());
+        assertEquals("wonen", feedback.getWordToGuess());
+    }
+
+    @Test
+    @DisplayName("gets list marks from feedback")
+    void getFeedbackId() {
+        System.out.println(feedbackCorrect.getFeedbackId());
+        assertEquals(null, feedbackCorrect.getFeedbackId());
+    }
+
+    @Test
+    @DisplayName("gets list marks from feedback")
+    void getWordToGuess() {
+        assertEquals("woord", feedbackCorrect.getWordToGuess());
+    }
+
+
+    @Test
     @DisplayName("gets list marks from feedback")
     void getMarks() {
         assertEquals(List.of(CORRECT, CORRECT, CORRECT, CORRECT, CORRECT), feedbackCorrect.getMarks());
@@ -73,7 +114,7 @@ class FeedbackTest {
     @Test
     @DisplayName("gets list of marks from feedback containing Invalid because wrong attempt")
     void getInvalidMarks() {
-        assertEquals(List.of(INVALID, INVALID), feedbackInvalid.getMarks());
+        assertEquals(List.of(INVALID), feedbackInvalid.getMarks());
     }
 
     @Test

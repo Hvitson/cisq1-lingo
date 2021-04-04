@@ -27,13 +27,13 @@ public class HintTest {
     @Test
     @DisplayName("Hint is created correctly without feedback")
     void hintCreatedWithoutFeedback() {
-        assertEquals(List.of('w','.','.','.','.'), hintWithout);
+        assertEquals(new Hint(List.of('w','.','.','.','.')), hintWithout);
     }
 
     @Test
     @DisplayName("Hint is created correctly with feedback")
     void hintCreatedWithFeedback() {
-        assertEquals(List.of('w','.','.','e','n'), hintWith);
+        assertEquals(new Hint(List.of('w','.','.','e','n')), hintWith);
     }
 
     @Test
