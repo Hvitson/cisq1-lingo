@@ -8,6 +8,7 @@ import org.springframework.lang.Nullable;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GameResponse implements Serializable {
@@ -20,14 +21,17 @@ public class GameResponse implements Serializable {
     @NotNull
     private final Integer score;
     @NotNull
-    private final RoundResponse round;
+    private final List<RoundResponse> roundList;
 
     public GameResponse(Game game) {
         this.gameId = game.getGameId();
         this.stateGame = game.getState();
         this.playingRoundNumber = game.getPlayingRoundNumber();
         this.score = game.getScore();
-        this.round = new RoundResponse(game.getLastRound());
+        this.roundList = new ArrayList<>();
+        for (Round round : game.getRounds()) {
+            roundList.add(new RoundResponse(round));
+        }
     }
 
     public Long getGameId() {
@@ -46,7 +50,7 @@ public class GameResponse implements Serializable {
         return score;
     }
 
-    public RoundResponse getRound() {
-        return round;
+    public List<RoundResponse> getRounds() {
+        return roundList;
     }
 }
