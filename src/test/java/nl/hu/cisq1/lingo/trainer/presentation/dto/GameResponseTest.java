@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class GameResponseTest {
+class GameResponseTest {
     private Game game;
 
     @BeforeEach
@@ -29,4 +29,5 @@ public class GameResponseTest {
         assertEquals(game.getScore(), response.getScore());
         assertEquals(game.getRounds().size(), response.getRounds().size());
     }
+
 }

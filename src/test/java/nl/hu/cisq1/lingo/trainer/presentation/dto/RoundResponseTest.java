@@ -29,4 +29,5 @@ class RoundResponseTest {
         assertEquals(game.getLastRound().getHint(), response.getHint());
         assertEquals(game.getLastRound().getFeedbacks().size(), response.getFeedbackList().size());
     }
+
 }

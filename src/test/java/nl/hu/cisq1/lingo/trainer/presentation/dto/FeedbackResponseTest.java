@@ -1,13 +1,11 @@
 package nl.hu.cisq1.lingo.trainer.presentation.dto;
 
 import nl.hu.cisq1.lingo.trainer.domain.Game;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class FeedbackResponseTest {
     private Game game;
