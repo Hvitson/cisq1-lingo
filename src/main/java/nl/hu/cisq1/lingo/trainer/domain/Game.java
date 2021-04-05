@@ -2,7 +2,6 @@ package nl.hu.cisq1.lingo.trainer.domain;
 
 import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidRoundException;
 import nl.hu.cisq1.lingo.trainer.domain.state.StateGame;
-import nl.hu.cisq1.lingo.trainer.domain.state.StateRound;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -50,15 +49,17 @@ public class Game implements Serializable {
     }
 
     public void createRound(String wordToGuess) throws InvalidRoundException {
-        if (rounds.isEmpty() && this.state == WAITING_FOR_ROUND) {
+        if (rounds.isEmpty() && this.state == WAITING_FOR_ROUND || getLastRound().getState() != WAITING_FOR_INPUT) {
             rounds.add(new Round(wordToGuess));
             playingRoundNumber += 1;
             state = PLAYING_ROUND;
-        } else if (getLastRound().getState() != WAITING_FOR_INPUT) {
-            rounds.add(new Round(wordToGuess));
-            playingRoundNumber += 1;
-            state = PLAYING_ROUND;
-        } else {
+        }
+//        else if (getLastRound().getState() != WAITING_FOR_INPUT) {
+//            rounds.add(new Round(wordToGuess));
+//            playingRoundNumber += 1;
+//            state = PLAYING_ROUND;
+//        }
+        else {
             throw new InvalidRoundException("finish your last round before you start a new one!");
         }
     }
@@ -76,7 +77,7 @@ public class Game implements Serializable {
         }
     }
 
-    public Integer calculateScore(Integer guesses) {
+    private Integer calculateScore(Integer guesses) {
         return (5 * ( 5 - guesses )) + 5;
     }
 
@@ -100,7 +101,7 @@ public class Game implements Serializable {
         return rounds;
     }
 
-    public void setScore(Integer score) {
+    private void setScore(Integer score) {
         this.score = score;
     }
 

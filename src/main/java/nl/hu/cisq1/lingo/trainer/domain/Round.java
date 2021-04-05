@@ -1,6 +1,5 @@
 package nl.hu.cisq1.lingo.trainer.domain;
 
-
 import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidFeedbackException;
 import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidRoundException;
 import nl.hu.cisq1.lingo.trainer.domain.state.StateRound;
@@ -38,7 +37,7 @@ public class Round implements Serializable {
     }
 
     public Feedback getLastFeedback() throws InvalidFeedbackException {
-        if (feedbacks.size() >= 1) {
+        if (!feedbacks.isEmpty()) {
             return feedbacks.get(feedbacks.size() - 1);
         }
         throw new InvalidFeedbackException("This round does not contain any feedback");
@@ -105,9 +104,7 @@ public class Round implements Serializable {
         if (Objects.equals(wordToGuess, round.wordToGuess)) {
             if (Objects.equals(guesses, round.guesses)) {
                 if (Objects.equals(feedbacks, round.feedbacks)) {
-                    if (Objects.equals(hint, round.hint)) {
-                        return true;
-                    }
+                    return Objects.equals(hint, round.hint);
                 }
             }
         }

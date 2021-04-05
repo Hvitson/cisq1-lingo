@@ -19,7 +19,7 @@ import static nl.hu.cisq1.lingo.trainer.domain.state.StateRound.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class TrainerServiceTest {
+class TrainerServiceTest {
     SpringGameRepository gameRepository = mock(SpringGameRepository.class);
     WordService wordService = mock(WordService.class);
     TrainerService service = new TrainerService(gameRepository, wordService);

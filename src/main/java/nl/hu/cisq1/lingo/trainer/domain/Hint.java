@@ -1,14 +1,14 @@
 package nl.hu.cisq1.lingo.trainer.domain;
 
-import javax.persistence.Embeddable;
-import javax.persistence.Embedded;
-
-import static nl.hu.cisq1.lingo.trainer.domain.Mark.*;
-
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static nl.hu.cisq1.lingo.trainer.domain.Mark.*;
 
 public class Hint implements Serializable {
     private List<Character> chars;

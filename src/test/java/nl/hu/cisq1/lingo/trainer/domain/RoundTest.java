@@ -47,9 +47,9 @@ class RoundTest {
     @Test
     @DisplayName("check if StateRound is 'WAITING_FOR_INPUT' after round is created")
     void roundIsPlayable() {
-        assertSame(round.getState(), WAITING_FOR_INPUT);
-        assertNotSame(round.getState(), WON);
-        assertNotSame(round.getState(), LOST);
+        assertSame(WAITING_FOR_INPUT, round.getState());
+        assertNotSame(WON, round.getState());
+        assertNotSame(LOST, round.getState());
     }
 
     @Test
@@ -57,9 +57,9 @@ class RoundTest {
     void roundIsPlayableAfterGuessesingLessThanFiveTimes() {
         round.doGuess("jooow");
         assertEquals(1, round.getGuesses());
-        assertSame(round.getState(), WAITING_FOR_INPUT);
-        assertNotSame(round.getState(), WON);
-        assertNotSame(round.getState(), LOST);
+        assertSame(WAITING_FOR_INPUT, round.getState());
+        assertNotSame(WON, round.getState());
+        assertNotSame(LOST, round.getState());
     }
 
     //check if also after guess
@@ -78,18 +78,18 @@ class RoundTest {
         round.doGuess("wonee");
         round.doGuess("wonee");
         round.doGuess("wonee");
-        assertTrue(round.getState() == LOST);
-        assertTrue(round.getState() != WAITING_FOR_INPUT);
-        assertTrue(round.getState() != WON);
+        assertSame( LOST, round.getState());
+        assertNotSame(WAITING_FOR_INPUT, round.getState());
+        assertNotSame(WON, round.getState());
     }
 
     @Test
     @DisplayName("check if StateRound changes to WON after guessing the word")
     void RoundIsOverIfGuessedCorrect() {
         round.doGuess("wonen");
-        assertTrue(round.getState() == WON);
-        assertTrue(round.getState() != WAITING_FOR_INPUT);
-        assertTrue(round.getState() != LOST);
+        assertSame(WON, round.getState());
+        assertNotSame(WAITING_FOR_INPUT, round.getState());
+        assertNotSame(LOST, round.getState());
     }
 
     @Test
