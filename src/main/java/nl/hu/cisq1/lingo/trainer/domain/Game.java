@@ -54,11 +54,6 @@ public class Game implements Serializable {
             playingRoundNumber += 1;
             state = PLAYING_ROUND;
         }
-//        else if (getLastRound().getState() != WAITING_FOR_INPUT) {
-//            rounds.add(new Round(wordToGuess));
-//            playingRoundNumber += 1;
-//            state = PLAYING_ROUND;
-//        }
         else {
             throw new InvalidRoundException("finish your last round before you start a new one!");
         }
