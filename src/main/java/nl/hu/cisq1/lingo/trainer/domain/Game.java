@@ -77,7 +77,7 @@ public class Game implements Serializable {
         }
     }
 
-    private Integer calculateScore(Integer guesses) {
+    public Integer calculateScore(Integer guesses) {
         return (5 * ( 5 - guesses )) + 5;
     }
 
@@ -101,7 +101,7 @@ public class Game implements Serializable {
         return rounds;
     }
 
-    private void setScore(Integer score) {
+    public void setScore(Integer score) {
         this.score = score;
     }
 
