@@ -26,16 +26,14 @@ public class TrainerService {
     }
 
     public Game findGame(Long id) throws InvalidGameException {
-        return gameRepository.findGameByGameId(id).orElseThrow(() -> new InvalidGameException("Game with id " + id + " not found"));
+        return gameRepository.findById(id).orElseThrow(() -> new InvalidGameException("Game with id " + id + " not found"));
     }
 
     public Game startGame() {
         Game game = new Game();
         game.createRound(wordService.provideRandomWord(5));
 
-        gameRepository.save(game);
-
-        return game;
+        return this.gameRepository.save(game);
     }
 
 
@@ -44,17 +42,13 @@ public class TrainerService {
         Integer lengthNextWord = game.lengthNextWordToGuess();
         game.createRound(wordService.provideRandomWord(lengthNextWord));
 
-        gameRepository.save(game);
-
-        return game;
+        return this.gameRepository.save(game);
     }
 
     public Game doGuess(Long id, String attempt) {
         Game game = findGame(id);
         game.doGuess(attempt);
 
-        gameRepository.save(game);
-
-        return game;
+        return this.gameRepository.save(game);
     }
 }

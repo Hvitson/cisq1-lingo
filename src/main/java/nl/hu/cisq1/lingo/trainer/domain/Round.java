@@ -101,14 +101,12 @@ public class Round implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Round round = (Round) o;
-        if (Objects.equals(wordToGuess, round.wordToGuess)) {
-            if (Objects.equals(guesses, round.guesses)) {
-                if (Objects.equals(feedbacks, round.feedbacks)) {
-                    return Objects.equals(hint, round.hint);
-                }
-            }
-        }
-        return false;
+        return Objects.equals(roundId, round.roundId) &&
+                wordToGuess.equals(round.wordToGuess) &&
+                state == round.state &&
+                guesses.equals(round.guesses) &&
+                Objects.equals(feedbacks, round.feedbacks) &&
+                Objects.equals(hint, round.hint);
     }
 
     @Override

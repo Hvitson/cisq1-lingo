@@ -288,8 +288,15 @@ class RoundTest {
     void roundPartiallyEqualsRoundHint() {
         Round roundCheck = new Round("wooon");
         roundCheck.doGuess("woeee");
-        roundCheck.getFeedbacks().remove(roundCheck.getLastFeedback());
-        roundCheck.doGuess("iAmChEeTo");
+        roundCheck.getFeedbacks().remove(roundCheck.getHint());
+        assertFalse(round.equals(roundCheck));
+    }
+
+    @Test
+    @DisplayName("Round partially equals test -> state different")
+    void roundPartiallyEqualsRoundState() {
+        Round roundCheck = new Round("wooon");
+        roundCheck.setState(WAITING_FOR_INPUT);
         assertFalse(round.equals(roundCheck));
     }
 
