@@ -30,26 +30,8 @@ public class Game implements Serializable {
         this.score = 0;
     }
 
-
-    public Integer lengthNextWordToGuess() {
-        Integer numba = this.getLastRound().getLengthWordToGuess();
-        if (numba == 5) {
-            return 6;
-        } else if (numba == 6) {
-            return 7;
-        } else if (numba == 7) {
-            return 5;
-        } else {
-            throw new InvalidRoundException("Length not supported");
-        }
-    }
-
-    public Round getLastRound() {
-            return rounds.get(rounds.size() - 1);
-    }
-
     public void createRound(String wordToGuess) throws InvalidRoundException {
-        if (rounds.isEmpty() && this.state == WAITING_FOR_ROUND || getLastRound().getState() != WAITING_FOR_INPUT) {
+        if (rounds.isEmpty() && this.state == WAITING_FOR_ROUND || state != PLAYING_ROUND && getLastRound().getState() != WAITING_FOR_INPUT ) {
             rounds.add(new Round(wordToGuess));
             playingRoundNumber += 1;
             state = PLAYING_ROUND;
@@ -59,7 +41,17 @@ public class Game implements Serializable {
         }
     }
 
+    public Round getLastRound() throws IndexOutOfBoundsException {
+        if (rounds.isEmpty()) {
+            throw new IndexOutOfBoundsException("you have to create a round before you can get it");
+        }
+        return rounds.get(rounds.size() - 1);
+    }
+
     public void doGuess(String attempt) throws InvalidRoundException {
+        if (this.getRounds().isEmpty()) {
+            throw new InvalidRoundException("you have to start a round before you can play one!");
+        }
         Round currentRound = getLastRound();
         if (currentRound.getState() == WAITING_FOR_INPUT) {
             currentRound.doGuess(attempt);
@@ -74,6 +66,19 @@ public class Game implements Serializable {
 
     public Integer calculateScore(Integer guesses) {
         return (5 * ( 5 - guesses )) + 5;
+    }
+
+    public Integer lengthNextWordToGuess() throws InvalidRoundException {
+        Integer numba = this.getLastRound().getLengthWordToGuess();
+        if (numba == 5) {
+            return 6;
+        } else if (numba == 6) {
+            return 7;
+        } else if (numba == 7) {
+            return 5;
+        } else {
+            throw new InvalidRoundException("Length not supported");
+        }
     }
 
     public Long getGameId() {
@@ -111,13 +116,5 @@ public class Game implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(rounds, score);
-    }
-
-    @Override
-    public String toString() {
-        return "Game{" +
-                "rounds=" + rounds +
-                ", score=" + score +
-                '}';
     }
 }

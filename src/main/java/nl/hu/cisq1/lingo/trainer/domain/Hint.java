@@ -59,9 +59,4 @@ public class Hint implements Serializable {
     public int hashCode() {
         return Objects.hash(chars);
     }
-
-    @Override
-    public String toString() {
-        return ""+ chars +"";
-    }
 }

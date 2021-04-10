@@ -19,16 +19,16 @@ public class GameResponse implements Serializable {
     @NotNull
     private final Integer score;
     @NotNull
-    private final List<RoundResponse> roundList;
+    private final List<RoundResponse> rounds;
 
     public GameResponse(Game game) {
         this.gameId = game.getGameId();
         this.stateGame = game.getState();
         this.playingRoundNumber = game.getPlayingRoundNumber();
         this.score = game.getScore();
-        this.roundList = new ArrayList<>();
+        this.rounds = new ArrayList<>();
         for (Round round : game.getRounds()) {
-            roundList.add(new RoundResponse(round));
+            rounds.add(new RoundResponse(round));
         }
     }
 
@@ -49,6 +49,6 @@ public class GameResponse implements Serializable {
     }
 
     public List<RoundResponse> getRounds() {
-        return roundList;
+        return rounds;
     }
 }

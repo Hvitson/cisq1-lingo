@@ -1,5 +1,6 @@
 package nl.hu.cisq1.lingo.trainer.application;
 
+import javassist.NotFoundException;
 import nl.hu.cisq1.lingo.trainer.data.SpringGameRepository;
 import nl.hu.cisq1.lingo.trainer.domain.Game;
 import nl.hu.cisq1.lingo.trainer.domain.Round;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,10 +22,11 @@ import static nl.hu.cisq1.lingo.trainer.domain.state.StateRound.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@SpringBootTest
 class TrainerServiceTest {
-    SpringGameRepository gameRepository = mock(SpringGameRepository.class);
-    WordService wordService = mock(WordService.class);
-    TrainerService service = new TrainerService(gameRepository, wordService);
+    private final SpringGameRepository gameRepository = mock(SpringGameRepository.class);
+    private final WordService wordService = mock(WordService.class);
+    private final TrainerService service = new TrainerService(gameRepository, wordService);
     private static Game game;
 
     @BeforeEach
@@ -34,7 +37,7 @@ class TrainerServiceTest {
 
         game.createRound(wordService.provideRandomWord(5));
 
-        when(service.startGame()).thenReturn(mock(Game.class));
+        when(service.createGame()).thenReturn(mock(Game.class));
     }
 
     @AfterEach
@@ -43,19 +46,8 @@ class TrainerServiceTest {
     }
 
     @Test
-    @DisplayName("getAllGames")
-    void getAllGames() {
-        when(gameRepository.findAll()).thenReturn(List.of(game, new Game(), new Game()));
-
-        assertEquals(3, service.getAllGames().size());
-        assertEquals("appel", service.getAllGames().get(0).getLastRound().getWordToGuess());
-        assertEquals(0, service.getAllGames().get(1).getScore());
-        verify(gameRepository, times(3)).findAll();
-    }
-
-    @Test
     @DisplayName("findGame by id")
-    void findGame() {
+    void findGame() throws NotFoundException {
         when(gameRepository.findById(2L)).thenReturn(Optional.of(game));
 
         Game toFindGame = service.findGame(2L);
@@ -68,7 +60,8 @@ class TrainerServiceTest {
     @Test
     @DisplayName("findGame by id but throw exception")
     void findGameThrowException() {
-        assertThrows(InvalidGameException.class, () -> service.findGame(1L));
+        assertThrows(NotFoundException.class, () -> service.findGame(1L));
+
         verify(gameRepository, times(1)).findById(1L);
     }
 
@@ -77,7 +70,7 @@ class TrainerServiceTest {
     void startGame() {
         when(gameRepository.save(game)).thenReturn(game);
 
-        Game newGame = service.startGame();
+        Game newGame = service.createGame();
 
         assertEquals(PLAYING_ROUND, newGame.getState());
         assertEquals(1, newGame.getPlayingRoundNumber());
@@ -87,7 +80,7 @@ class TrainerServiceTest {
 
     @Test
     @DisplayName("start a new round")
-    void startRound() {
+    void startRound() throws NotFoundException {
         assertEquals(1, game.getRounds().size());
         assertEquals("appel", game.getLastRound().getWordToGuess());
 
@@ -97,7 +90,7 @@ class TrainerServiceTest {
         when(gameRepository.findById(10L)).thenReturn(Optional.of(game));
         when(gameRepository.save(game)).thenReturn(game);
 
-        Game updatedGame = service.startRound(10L);
+        Game updatedGame = service.createRound(10L);
 
         assertEquals(2, updatedGame.getRounds().size());
         assertEquals("appell", updatedGame.getLastRound().getWordToGuess());
@@ -114,7 +107,7 @@ class TrainerServiceTest {
 
         assertThrows(
                 InvalidRoundException.class,
-                () -> service.startRound(10L)
+                () -> service.createRound(10L)
         );
         verify(wordService, times(1)).provideRandomWord(6);
         verify(gameRepository, times(1)).findById(10L);
@@ -122,7 +115,7 @@ class TrainerServiceTest {
 
     @Test
     @DisplayName("do guess on a round that's ongoing")
-    void doGuessOngoingRound() {
+    void doGuessOngoingRound() throws NotFoundException {
         assertEquals(0, game.getLastRound().getFeedbacks().size());
 
         when(gameRepository.findById(15L)).thenReturn(Optional.of(game));

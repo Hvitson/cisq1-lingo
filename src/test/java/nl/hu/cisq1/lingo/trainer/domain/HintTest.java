@@ -1,105 +1,153 @@
 package nl.hu.cisq1.lingo.trainer.domain;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class HintTest {
-    private Hint hintWith;
-    private Hint hintWithout;
-    private String wordToGuess;
+    static Stream<Arguments> provideCorrectHintExamples() {
+        return Stream.of(
+                Arguments.of(
+                        "wonen",
+                        List.of(),
+                        new Hint(List.of('w','.','.','.','.'))
+                ),
+                Arguments.of(
+                        "wonen", List.of(
+                                new Feedback("weeee", "wonen"),
+                                new Feedback("weeon", "wonen"),
+                                new Feedback("weerr", "wonen")),
+                        new Hint(List.of('w','.','.','e','n'))
+                ),
+                Arguments.of(
+                        "wonen", List.of(
+                                new Feedback("wonen", "wonen"),
+                                new Feedback("weeon", "wonen"),
+                                new Feedback("weerr", "wonen")),
+                        new Hint(List.of('w','o','n','e','n'))
+                )
+        );
+    }
 
-    @BeforeEach
-    void createHints() {
-        wordToGuess = "wonen";
-        hintWithout = Hint.generateHint(wordToGuess, List.of());
-        hintWith = Hint.generateHint(wordToGuess, List.of(
-                new Feedback("weeee", wordToGuess),
-                new Feedback("weeon", wordToGuess),
-                new Feedback("weerr", wordToGuess)
-        ));
+    @ParameterizedTest
+    @MethodSource("provideCorrectHintExamples")
+    @DisplayName("Hint is created correctly with and without feedbacks")
+    void hintCreatedCorrectly(String word, List<Feedback> feedbacks, Hint expected) {
+        Hint hint = Hint.generateHint(word, feedbacks);
+        assertEquals(expected, hint);
+    }
+
+    static Stream<Arguments> provideIncorrectGuessesExamples() {
+        return Stream.of(
+                Arguments.of(
+                        "wonen",
+                        List.of(
+                                new Feedback("woooo", "wonen"),
+                                new Feedback("reuteyuteyutyutyu", "wonen")
+                        ),
+                        new Hint(List.of('w','o','.','.','.'))
+                ),
+                Arguments.of(
+                        "wonen",
+                        List.of(new Feedback("reuteyuteyutyutyu", "wonen")),
+                        new Hint(List.of('w','.','.','.','.'))
+                )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideIncorrectGuessesExamples")
+    @DisplayName("Hint is created correctly with wrong guess")
+    void hintCreatedWithoutFeedback(String word, List<Feedback> feedbacks, Hint expected) {
+        Hint hint = Hint.generateHint(word, feedbacks);
+        assertEquals(expected, hint);
     }
 
     @Test
-    @DisplayName("Hint is created correctly without feedback")
-    void hintCreatedWithoutFeedback() {
-        assertEquals(new Hint(List.of('w','.','.','.','.')), hintWithout);
+    @DisplayName("get chars gives list of characters")
+    void getChars() {
+        Hint hint = new Hint(List.of('w','o','.','.','.'));
+        assertNotNull(hint.getChars());
+        assertEquals(List.of('w','o','.','.','.'), hint.getChars());
     }
 
-    @Test
-    @DisplayName("Hint is created correctly with feedback")
-    void hintCreatedWithFeedback() {
-        assertEquals(new Hint(List.of('w','.','.','e','n')), hintWith);
+    static Stream<Arguments> provideEqualsExamples() {
+        Hint hint = new Hint(List.of('w','o','.','.','.'));
+        return Stream.of(
+                Arguments.of(
+                        hint,
+                        hint,
+                        true
+                ),
+                Arguments.of(
+                        new Hint(List.of('w','.','.','.','.')),
+                        new Hint(List.of('w','.','.','.','.')),
+                        true
+                ),
+                Arguments.of(
+                        hint,
+                        new Hint(List.of('w','o','.','.','.')),
+                        true
+                ),
+                Arguments.of(
+                        new Hint(List.of('w','o','.','.','.')),
+                        new Hint(List.of('w','.','.','.','.')),
+                        false
+                        ),
+                Arguments.of(
+                        new Hint(List.of('w','.','.','.','.')),
+                        new Hint(List.of('w','o','.','.','.')),
+                        false
+                ),
+                Arguments.of(
+                        new Hint(List.of('w','o','.','.','.')),
+                        null,
+                        false
+                )
+        );
     }
 
-    @Test
-    @DisplayName("Hint hashcode test")
-    void hintHashCode() {
-        Hint hint1 = new Hint(List.of('w','.','.','.','.'));
-        Hint hint2 = new Hint(List.of('w','.','.','e','n'));
-        assertEquals(hint1.hashCode(), hintWithout.hashCode());
-        assertEquals(hint2.hashCode(), hintWith.hashCode());
-    }
-
-    @Test
-    @DisplayName("Hint hashcode 0 test")
-    void hintHashCode0() {
-        if (hintWith.hashCode() == 0) {
-            fail();
+    @ParameterizedTest
+    @MethodSource("provideEqualsExamples")
+    @DisplayName("Hint equals and hashcode methods test")
+    void hintEqualsHashcode(Hint hint, Hint compareHint, boolean isEqual) {
+        assertEquals(hint.equals(compareHint), isEqual);
+        if (compareHint != null) {
+            assertEquals(Objects.equals(hint.hashCode(), compareHint.hashCode()), isEqual);
         }
-        if (hintWithout.hashCode() == 0) {
-            fail();
-        }
-        assertFalse(false);
     }
 
-    @Test
-    @DisplayName("Hint equals test")
-    void hintEquals() {
-        Hint hint = new Hint(List.of('w','.','.','.','.'));
-        assertTrue(hint.equals(hintWithout));
+    static Stream<Arguments> provideNotEqualsExamples() {
+        return Stream.of(
+                Arguments.of(
+                        new Hint(List.of('w','o','.','.','.')),
+                        new Hint(List.of('w','.','.','.','.'))
+                ),
+                Arguments.of(
+                        new Hint(List.of('w','o','.','.','.')),
+                        new Hint(List.of('w','.','.','.','.','.'))
+                ),
+                Arguments.of(
+                        new Hint(List.of('w','o','.','.','.')),
+                        null
+                )
+        );
     }
 
-    @Test
-    @DisplayName("Hint not equals test")
-    void hintNotEquals() {
-        Hint hint = hintWith;
-        assertTrue(hintWith.equals(hint));
-    }
-
-    @Test
-    @DisplayName("Hint equals different type list test")
-    void hintNotEqualsDifferentType() {
-        List<Character> hint = List.of('w','.','.','.','.');
-        assertFalse(hintWith.equals(hint));
-    }
-
-    @Test
-    @DisplayName("Hint equals null test")
-    void hintNotEqualsNull() {
-        Hint hint = null;
-        assertFalse(hintWith.equals(hint));
-    }
-
-    @Test
-    @DisplayName("Hint partially equals test")
-    void hintPartiallyEqualsHint() {
-        Hint hintCheck = Hint.generateHint(wordToGuess, List.of(
-                new Feedback("weeee", "woord"),
-                new Feedback("woeon", "woord")
-        ));
-        assertFalse(hintWith.equals(hintCheck));
-    }
-
-    @Test
-    @DisplayName("Hint toString test")
-    void hintToString() {
-        Hint hint = new Hint(List.of('w','.','.','.','.'));
-        assertEquals(hint.toString(), hintWithout.toString());
-        assertEquals("[w, ., ., e, n]", hintWith.toString());
+    @ParameterizedTest
+    @MethodSource("provideNotEqualsExamples")
+    @DisplayName("Hint equals and hashcode methods test")
+    void hintNotEquals(Hint hint, Hint compareHint) {
+        assertFalse(hint.equals(compareHint));
     }
 }

@@ -30,33 +30,35 @@ public class Round implements Serializable {
     public Round() {}
     public Round(String wordToGuess) {
         this.wordToGuess = wordToGuess;
-        state = WAITING_FOR_INPUT;
-        guesses = 0;
+        this.state = WAITING_FOR_INPUT;
+        this.guesses = 0;
         this.feedbacks = new ArrayList<>();
         this.hint = Hint.generateHint(wordToGuess, feedbacks).getChars();
     }
 
-    public Feedback getLastFeedback() throws InvalidFeedbackException {
-        if (!feedbacks.isEmpty()) {
-            return feedbacks.get(feedbacks.size() - 1);
+    public Feedback getLastFeedback() throws IndexOutOfBoundsException {
+        if (feedbacks.isEmpty()) {
+            throw new IndexOutOfBoundsException("This round does not contain any feedback");
         }
-        throw new InvalidFeedbackException("This round does not contain any feedback");
+        return feedbacks.get(feedbacks.size() - 1);
     }
 
     public void doGuess(String attempt) throws InvalidRoundException {
         if (this.getState() == WAITING_FOR_INPUT) {
-            Feedback newFeedback = new Feedback(attempt, wordToGuess);
-            feedbacks.add(newFeedback);
-            hint = Hint.generateHint(wordToGuess, feedbacks).getChars();
-            guesses += 1;
-            if (attempt.equals(wordToGuess)) {
-                state = WON;
+            Feedback newFeedback = new Feedback(attempt, this.wordToGuess);
+            this.feedbacks.add(newFeedback);
+            if (this.getLastFeedback().isGuessValid()) {
+                this.hint = Hint.generateHint(wordToGuess, feedbacks).getChars();
+            }
+            this.guesses += 1;
+            if (this.getLastFeedback().isWordGuessed()) {
+                this.state = WON;
             }
             if (guesses == 5) {
-                state = LOST;
+                this.state = LOST;
             }
         } else {
-            throw new InvalidRoundException("Round already over!");
+            throw new InvalidRoundException("Round is over!");
         }
     }
 
@@ -112,14 +114,5 @@ public class Round implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(wordToGuess, guesses, feedbacks, hint);
-    }
-
-    @Override
-    public String toString() {
-        return "Round{" +
-                "wordToGuess=" + wordToGuess +
-                ", guesses=" + guesses +
-                ", feedbacks=" + feedbacks +
-                '}';
     }
 }

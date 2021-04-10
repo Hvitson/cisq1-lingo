@@ -30,13 +30,9 @@ public class Feedback implements Serializable {
     }
 
     public static List<Mark> createMarks(String attempt, String wordToGuess) {
-        if (attempt == null) {
-            throw new InvalidFeedbackException("attempt can't be null!");
-        }
-
         List<Mark> marks = new ArrayList<>();
 
-        if (attempt.length() != wordToGuess.length()) {
+        if (attempt == null || attempt.length() != wordToGuess.length()) {
             marks.add(INVALID);
             return marks;
         }
@@ -51,8 +47,6 @@ public class Feedback implements Serializable {
         for (char character : attempt.toCharArray()) {
             charsAttempt.add(character);
         }
-
-
 
         for (int i = 0; i < charsWordToGuess.size(); i++) {
             if (charsAttempt.get(i).equals(charsWordToGuess.get(i))) {
@@ -79,16 +73,8 @@ public class Feedback implements Serializable {
         return marks.stream().noneMatch(mark -> mark == INVALID);
     }
 
-    public Long getFeedbackId() {
-        return feedbackId;
-    }
-
     public String getAttempt() {
         return attempt;
-    }
-
-    public String getWordToGuess() {
-        return wordToGuess;
     }
 
     public List<Mark> getMarks() {
@@ -106,13 +92,5 @@ public class Feedback implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(attempt, wordToGuess, marks);
-    }
-
-    @Override
-    public String toString() {
-        return "Feedback{" +
-                "attempt='" + attempt + '\'' +
-                ", marks=" + marks +
-                '}';
     }
 }

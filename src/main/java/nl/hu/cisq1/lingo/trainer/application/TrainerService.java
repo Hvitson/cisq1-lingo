@@ -1,5 +1,6 @@
 package nl.hu.cisq1.lingo.trainer.application;
 
+import javassist.NotFoundException;
 import nl.hu.cisq1.lingo.trainer.data.SpringGameRepository;
 import nl.hu.cisq1.lingo.trainer.domain.Game;
 import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidGameException;
@@ -21,15 +22,16 @@ public class TrainerService {
         this.wordService = wordService;
     }
 
+    //todo: haal weg
     public List<Game> getAllGames() {
         return gameRepository.findAll();
     }
 
-    public Game findGame(Long id) throws InvalidGameException {
-        return gameRepository.findById(id).orElseThrow(() -> new InvalidGameException("Game with id " + id + " not found"));
+    public Game findGame(Long id) throws NotFoundException {
+        return gameRepository.findById(id).orElseThrow(() -> new NotFoundException("Game with id " + id + " not found"));
     }
 
-    public Game startGame() {
+    public Game createGame() {
         Game game = new Game();
         game.createRound(wordService.provideRandomWord(5));
 
@@ -37,7 +39,7 @@ public class TrainerService {
     }
 
 
-    public Game startRound(Long id) throws InvalidRoundException {
+    public Game createRound(Long id) throws InvalidGameException, InvalidRoundException, NotFoundException {
         Game game = findGame(id);
         Integer lengthNextWord = game.lengthNextWordToGuess();
         game.createRound(wordService.provideRandomWord(lengthNextWord));
@@ -45,10 +47,9 @@ public class TrainerService {
         return this.gameRepository.save(game);
     }
 
-    public Game doGuess(Long id, String attempt) {
+    public Game doGuess(Long id, String attempt) throws InvalidGameException, InvalidRoundException, NotFoundException {
         Game game = findGame(id);
         game.doGuess(attempt);
-
         return this.gameRepository.save(game);
     }
 }
