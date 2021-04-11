@@ -19,7 +19,7 @@ import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-public class TrainerControllerTest {
+class TrainerControllerTest {
     private final TrainerService SERVICE = mock(TrainerService.class);
     private final TrainerController CONTROLLER = new TrainerController(SERVICE);
     private static Game game;

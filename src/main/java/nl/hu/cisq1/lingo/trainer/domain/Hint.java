@@ -2,11 +2,8 @@ package nl.hu.cisq1.lingo.trainer.domain;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static nl.hu.cisq1.lingo.trainer.domain.Mark.*;
 
