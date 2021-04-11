@@ -3,18 +3,14 @@ package nl.hu.cisq1.lingo.trainer.application;
 import javassist.NotFoundException;
 import nl.hu.cisq1.lingo.trainer.data.SpringGameRepository;
 import nl.hu.cisq1.lingo.trainer.domain.Game;
-import nl.hu.cisq1.lingo.trainer.domain.Round;
-import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidGameException;
 import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidRoundException;
 import nl.hu.cisq1.lingo.words.application.WordService;
-import org.checkerframework.checker.nullness.Opt;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.List;
 import java.util.Optional;
 
 import static nl.hu.cisq1.lingo.trainer.domain.state.StateGame.*;
@@ -27,7 +23,7 @@ class TrainerServiceTest {
     private final SpringGameRepository gameRepository = mock(SpringGameRepository.class);
     private final WordService wordService = mock(WordService.class);
     private final TrainerService service = new TrainerService(gameRepository, wordService);
-    private static Game game;
+    private Game game;
 
     @BeforeEach
     void createMocks() {
@@ -70,27 +66,28 @@ class TrainerServiceTest {
     void startGame() {
         when(gameRepository.save(game)).thenReturn(game);
 
-        Game newGame = service.createGame();
+        Game newGame = (assertDoesNotThrow(() -> service.createGame()));
 
         assertEquals(PLAYING_ROUND, newGame.getState());
         assertEquals(1, newGame.getPlayingRoundNumber());
-        assertNotNull(newGame.getRounds());
-        verify(gameRepository, times(1)).save(game);
+        assertEquals(WAITING_FOR_INPUT, newGame.getLastRound().getState());
     }
 
     @Test
-    @DisplayName("start a new round")
-    void startRound() throws NotFoundException {
-        assertEquals(1, game.getRounds().size());
-        assertEquals("appel", game.getLastRound().getWordToGuess());
+    @DisplayName("start a new game does not throw")
+    void startGameDoesNotThrow() {
+        when(gameRepository.save(game)).thenReturn(game);
+        assertDoesNotThrow(() -> service.createGame());
+    }
 
-        game.doGuess("appel");
-
+    @Test
+    @DisplayName("start a new round on a game")
+    void startRound() {
         when(wordService.provideRandomWord(6)).thenReturn("appell");
         when(gameRepository.findById(10L)).thenReturn(Optional.of(game));
         when(gameRepository.save(game)).thenReturn(game);
 
-        Game updatedGame = service.createRound(10L);
+        Game updatedGame = (assertDoesNotThrow(() -> service.createRound(10L)));
 
         assertEquals(2, updatedGame.getRounds().size());
         assertEquals("appell", updatedGame.getLastRound().getWordToGuess());
@@ -100,7 +97,7 @@ class TrainerServiceTest {
     }
 
     @Test
-    @DisplayName("start a new round throws exception because game still ongoing")
+    @DisplayName("start a new round throws exception when game is ongoing")
     void startRoundThrowsException() {
         when(wordService.provideRandomWord(6)).thenReturn("appell");
         when(gameRepository.findById(10L)).thenReturn(Optional.of(game));
@@ -115,15 +112,12 @@ class TrainerServiceTest {
 
     @Test
     @DisplayName("do guess on a round that's ongoing")
-    void doGuessOngoingRound() throws NotFoundException {
-        assertEquals(0, game.getLastRound().getFeedbacks().size());
-
+    void doGuessOngoingRound() {
         when(gameRepository.findById(15L)).thenReturn(Optional.of(game));
         when(gameRepository.save(game)).thenReturn(game);
 
-        System.out.println(game);
-        Game updatedGame = service.doGuess(15L, "allep");
-        System.out.println("hoe "+updatedGame);
+        Game updatedGame = (assertDoesNotThrow(() -> service.doGuess(15L, "allep")));
+
         assertEquals(1, updatedGame.getLastRound().getFeedbacks().size());
         assertEquals(1, updatedGame.getLastRound().getGuesses());
         assertEquals("allep", updatedGame.getLastRound().getLastFeedback().getAttempt());

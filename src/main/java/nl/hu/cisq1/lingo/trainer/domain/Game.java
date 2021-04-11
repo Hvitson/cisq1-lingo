@@ -7,7 +7,6 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static nl.hu.cisq1.lingo.trainer.domain.state.StateGame.*;
 import static nl.hu.cisq1.lingo.trainer.domain.state.StateRound.*;
@@ -31,7 +30,7 @@ public class Game implements Serializable {
     }
 
     public void createRound(String wordToGuess) throws InvalidRoundException {
-        if (rounds.isEmpty() && this.state == WAITING_FOR_ROUND || state != PLAYING_ROUND && getLastRound().getState() != WAITING_FOR_INPUT ) {
+        if (rounds.isEmpty() && state == WAITING_FOR_ROUND || state != PLAYING_ROUND && getLastRound().getState() != WAITING_FOR_INPUT ) {
             rounds.add(new Round(wordToGuess));
             playingRoundNumber += 1;
             state = PLAYING_ROUND;
@@ -99,22 +98,5 @@ public class Game implements Serializable {
 
     public List<Round> getRounds() {
         return rounds;
-    }
-
-    public void setScore(Integer score) {
-        this.score = score;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Game game = (Game) o;
-        return Objects.equals(rounds, game.rounds) && Objects.equals(score, game.score);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(rounds, score);
     }
 }

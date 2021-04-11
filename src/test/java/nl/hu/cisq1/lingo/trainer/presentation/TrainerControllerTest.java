@@ -3,9 +3,6 @@ package nl.hu.cisq1.lingo.trainer.presentation;
 import javassist.NotFoundException;
 import nl.hu.cisq1.lingo.trainer.application.TrainerService;
 import nl.hu.cisq1.lingo.trainer.domain.Game;
-import nl.hu.cisq1.lingo.trainer.domain.Round;
-import javassist.NotFoundException;
-import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidGuessException;
 import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidRoundException;
 import nl.hu.cisq1.lingo.trainer.presentation.controller.TrainerController;
 import nl.hu.cisq1.lingo.trainer.presentation.dto.GameResponse;
@@ -17,8 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import java.util.List;
 
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -45,8 +40,8 @@ public class TrainerControllerTest {
     @DisplayName("get response entity of game response by game id")
     void getGame() throws NotFoundException {
         when(SERVICE.findGame(2L)).thenReturn(game);
-        ResponseEntity<GameResponse> gameById = CONTROLLER.getGame(2L);
 
+        ResponseEntity<GameResponse> gameById = assertDoesNotThrow(() -> CONTROLLER.getGame(2L));
         assertEquals(HttpStatus.OK, gameById.getStatusCode());
         verify(SERVICE, times(1)).findGame(2L);
     }
@@ -67,8 +62,8 @@ public class TrainerControllerTest {
     @DisplayName("get response entity of round response by game id")
     void getRound() throws NotFoundException {
         when(SERVICE.findGame(2L)).thenReturn(game);
-        ResponseEntity<RoundResponse> roundById =  CONTROLLER.getRound(2L);
 
+        ResponseEntity<RoundResponse> roundById =  assertDoesNotThrow(() -> CONTROLLER.getRound(2L));
         assertEquals(HttpStatus.OK, roundById.getStatusCode());
         verify(SERVICE, times(1)).findGame(2L);
     }
@@ -89,8 +84,8 @@ public class TrainerControllerTest {
     @DisplayName("create game")
     void createGame() {
         when(SERVICE.createGame()).thenReturn(game);
-        ResponseEntity<GameResponse> createdGame =  CONTROLLER.createGame();
 
+        ResponseEntity<GameResponse> createdGame =  assertDoesNotThrow(() -> CONTROLLER.createGame());
         assertEquals(HttpStatus.CREATED, createdGame.getStatusCode());
         verify(SERVICE, times(1)).createGame();
     }
@@ -99,8 +94,8 @@ public class TrainerControllerTest {
     @DisplayName("create round on a game")
     void createRound() throws NotFoundException {
         when(SERVICE.createRound(2L)).thenReturn(game);
-        ResponseEntity<RoundResponse> createdGame = CONTROLLER.createRound(2L);
 
+        ResponseEntity<RoundResponse> createdGame = assertDoesNotThrow(() -> CONTROLLER.createRound(2L));
         assertEquals(HttpStatus.CREATED, createdGame.getStatusCode());
         verify(SERVICE, times(1)).createRound(2L);
     }
@@ -133,8 +128,8 @@ public class TrainerControllerTest {
     @DisplayName("create round on a game")
     void doGuess() throws NotFoundException {
         when(SERVICE.doGuess(2L, "jooow")).thenReturn(game);
-        ResponseEntity<RoundResponse> guessedOnRound = CONTROLLER.doGuessOnRound(2L, "jooow");
 
+        ResponseEntity<RoundResponse> guessedOnRound = assertDoesNotThrow(() -> CONTROLLER.doGuessOnRound(2L, "jooow"));
         assertEquals(HttpStatus.OK, guessedOnRound.getStatusCode());
         verify(SERVICE, times(1)).doGuess(2L, "jooow");
     }

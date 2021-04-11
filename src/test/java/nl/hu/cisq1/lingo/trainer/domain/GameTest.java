@@ -1,21 +1,14 @@
 package nl.hu.cisq1.lingo.trainer.domain;
 
 import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidRoundException;
-import nl.hu.cisq1.lingo.trainer.domain.state.StateGame;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import java.util.List;
 import java.util.stream.Stream;
 
-import static nl.hu.cisq1.lingo.trainer.domain.state.StateRound.WAITING_FOR_INPUT;
 import static org.junit.jupiter.api.Assertions.*;
-
-
 import static nl.hu.cisq1.lingo.trainer.domain.state.StateGame.*;
-
 
 class GameTest {
     private static Game game;
@@ -71,7 +64,7 @@ class GameTest {
     }
 
     @Test
-    @DisplayName("get last feedback of round")
+    @DisplayName("get last round of game")
     void getLastRound() {
         game.createRound("jooow");
 
@@ -80,7 +73,7 @@ class GameTest {
     }
 
     @Test
-    @DisplayName("get last feedback of round")
+    @DisplayName("get last round of round when more than one round")
     void getLastRoundWhenMulti() {
         game.createRound("jooow");
         game.doGuess("jooow");
@@ -92,7 +85,7 @@ class GameTest {
     }
 
     @Test
-    @DisplayName("get last feedback when it does not exists")
+    @DisplayName("get last round throws when it does not exists")
     void getLastRoundThrowsException() {
         assertThrows(
                 IndexOutOfBoundsException.class,
@@ -101,7 +94,7 @@ class GameTest {
     }
 
     @Test
-    @DisplayName("do guess on rounds 1 to 5")
+    @DisplayName("do 5 guesses on rounds to see if it throws")
     void doGuessWhenRoundOngoing() {
         game.createRound("wonen");
         for(int i = 1; i < 6; i++) {
@@ -113,7 +106,7 @@ class GameTest {
     }
 
     @Test
-    @DisplayName("guess word to see if state chages game's state to WAITING_FOR_ROUND when round is won")
+    @DisplayName("win round to see if state is changed to WAITING_FOR_ROUND")
     void doGuessWhenOngoingRoundGuessed() {
         game.createRound("wonen");
 
@@ -122,11 +115,9 @@ class GameTest {
     }
 
     @Test
-    @DisplayName("guess word to see if state chages game's state to WAITING_FOR_ROUND when round is lost")
+    @DisplayName("lose round to see if state is changed to WAITING_FOR_ROUND")
     void doGuessWhenOngoingRoundNotGuessed() {
-
         game.createRound("wonen");
-
         for(int i = 0; i < 4; i++) {
             game.doGuess("jooow");
         }
@@ -194,6 +185,7 @@ class GameTest {
 
     @ParameterizedTest
     @MethodSource("provideGuessAmountExamples")
+    @DisplayName("calculate scores")
     void calculateGuessScore(Integer guesses, Integer expectedScore) {
         Integer score = game.calculateScore(guesses);
 
@@ -208,120 +200,65 @@ class GameTest {
         assertEquals(25, game.getScore());
     }
 
-    //todo: lengthNextWordToGuess tests
-    // equals en hash
+    static Stream<Arguments> provideLengthExamples() {
+        return Stream.of(
+                Arguments.of(
+                        new Game(),
+                        "wonen",
+                        6
+                ),
+                Arguments.of(
+                        new Game(),
+                        "wonenn",
+                        7
+                ),
+                Arguments.of(
+                        new Game(),
+                        "wonennn",
+                        5
+                )
+        );
+    }
 
-//    @Test
-//    @DisplayName("lengthNextWordToGuess returns right Integer before and after word is guessed with word length 5")
-//    void fuctionReturnsRightInteger6() {
-//        System.out.println(game);
-//        game.createRound("wonen");
-//        assertEquals(6, game.lengthNextWordToGuess());
-//        game.doGuess("wonen");
-//        assertEquals(6, game.lengthNextWordToGuess());
-//    }
-//
-//    @Test
-//    @DisplayName("lengthNextWordToGuess returns right Integer before and after word is guessed with word length 6")
-//    void functionReturnsRightInteger7() {
-//        game.createRound("wonenn");
-//        assertEquals(7, game.lengthNextWordToGuess());
-//        game.doGuess("wonenn");
-//        assertEquals(7, game.lengthNextWordToGuess());
-//    }
-//
-//    @Test
-//    @DisplayName("lengthNextWordToGuess returns right Integer before and after word is guessed with word length 7")
-//    void functionReturnsRightInteger5() {
-//        game.createRound("wonennn");
-//        assertEquals(5, game.lengthNextWordToGuess());
-//        game.doGuess("wonennn");
-//        assertEquals(5, game.lengthNextWordToGuess());
-//    }
-//
-//    @Test
-//    @DisplayName("lengthNextWordToGuess throws exception when length not supported")
-//    void lengthNextWordToGuessLengthNotSupportedThrows() {
-//        game.createRound("woon");
-//        Game game1 = new Game();
-//        game1.createRound("woonwoon");
-//
-//        assertEquals(4, game.getLastRound().getLengthWordToGuess());
-//        assertThrows(InvalidRoundException.class
-//                , () -> game.lengthNextWordToGuess());
-//        assertEquals(8, game1.getLastRound().getLengthWordToGuess());
-//        assertThrows(InvalidRoundException.class
-//                , () -> game1.lengthNextWordToGuess());
-//    }
-//
-//
-//
-//
-//
-//
-//
-//    //hash en equals
-//    @Test
-//    @DisplayName("Game hashcode test")
-//    void gameHashCode() {
-//        Game gameCheck = new Game();
-//        assertEquals(gameCheck.hashCode(), game.hashCode());
-//    }
-//
-//    @Test
-//    @DisplayName("Game hashcode 0 test")
-//    void feedbackHashCode0() {
-//        if (game.hashCode() == 0) {
-//            fail();
-//        }
-//        assertFalse(false);
-//    }
-//
-//    @Test
-//    @DisplayName("Game equals test")
-//    void gameEqualsGame() {
-//        Game gameCheck = new Game();
-//
-//        assertTrue(gameCheck.equals(game));
-//    }
-//
-//    @Test
-//    @DisplayName("Game partially equals test -> score different")
-//    void gamePartiallyEqualsGame() {
-//        Game gameCheck = new Game();
-//
-//        gameCheck.setScore(50);
-//
-//        assertFalse(gameCheck.equals(game));
-//    }
-//
-//    @Test
-//    @DisplayName("Game equals different type")
-//    void gameEqualsDifferentType() {
-//        assertFalse(game.equals(List.of(new Feedback("jooow", wordToGuess))));
-//    }
-//
-//    @Test
-//    @DisplayName("Game not equals test")
-//    void gameEqualsBySet() {
-//        Game gameCheck = game;
-//
-//        assertTrue(gameCheck.equals(game));
-//    }
-//
-//    @Test
-//    @DisplayName("game not equals game round")
-//    void gameRoundsNotEqualsgameRound() {
-//        Game gameCheck = new Game();
-//        gameCheck.setScore(50);
-//        gameCheck.getRounds().add(new Round(wordToGuess));
-//        assertFalse(game.equals(gameCheck));
-//    }
-//
-//    @Test
-//    @DisplayName("Game equals null test")
-//    void hintNotEqualsNull() {
-//        Game gameCheck = null;
-//        assertFalse(game.equals(gameCheck));
-//    }
+    @ParameterizedTest
+    @MethodSource("provideLengthExamples")
+    @DisplayName("lengthNextWordToGuess throws when length of word not supported")
+    void lengthNextWordToGuess(Game providedGame, String wordToGuess, Integer expectedLength) {
+        providedGame.createRound(wordToGuess);
+
+        assertDoesNotThrow(() -> providedGame.lengthNextWordToGuess());
+        assertEquals(expectedLength, providedGame.lengthNextWordToGuess());
+    }
+
+    static Stream<Arguments> provideIncorrectLengthExamples() {
+        return Stream.of(
+                Arguments.of(
+                        new Game(),
+                        "wone"
+                ),
+                Arguments.of(
+                        new Game(),
+                        "wonenghnn"
+                )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideIncorrectLengthExamples")
+    @DisplayName("lengthNextWordToGuess throws when length is wordToGuess is not supported")
+    void lengthNextWordToGuessThrows(Game providedGame, String wordToGuess) {
+        providedGame.createRound(wordToGuess);
+
+        assertThrows(InvalidRoundException.class,
+                () -> providedGame.lengthNextWordToGuess()
+        );
+    }
+
+    @Test
+    @DisplayName("lengthNextWordToGuess throws when game has no rounds")
+    void lengthNextWordToGuessThrowsOutOFBound() {
+        assertThrows(IndexOutOfBoundsException.class,
+                () -> game.lengthNextWordToGuess()
+        );
+    }
 }

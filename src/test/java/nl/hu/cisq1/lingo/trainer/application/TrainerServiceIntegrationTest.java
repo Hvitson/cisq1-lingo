@@ -74,7 +74,6 @@ public class TrainerServiceIntegrationTest {
     void createRound() {
         Long id = game.getGameId();
         game.doGuess(game.getLastRound().getWordToGuess());
-
         gameRepository.save(game);
 
         assertDoesNotThrow(
@@ -137,7 +136,7 @@ public class TrainerServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("do guess on round")
+    @DisplayName("do guess on round throws exception when game not found")
     void doGuessThrowsNotFound() {
         Long newId = game.getGameId()+1;
 
@@ -154,9 +153,7 @@ public class TrainerServiceIntegrationTest {
     @DisplayName("do guess on a game's round but no rounds exist")
     void doGuessThrowsRoundExceptionWhenEmpty() {
         game.getRounds().remove(0);
-
         Game emptyRoundGame = gameRepository.save(game);
-
         Long id = emptyRoundGame.getGameId();
 
         assertThrows(
@@ -170,7 +167,6 @@ public class TrainerServiceIntegrationTest {
     void doGuessThrowsRoundExceptionWhenRoundOver() {
         Long id = game.getGameId();
         game.doGuess(game.getLastRound().getWordToGuess());
-
         gameRepository.save(game);
 
         assertThrows(

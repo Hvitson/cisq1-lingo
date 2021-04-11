@@ -1,6 +1,5 @@
 package nl.hu.cisq1.lingo.trainer.domain;
 
-import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidFeedbackException;
 import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidRoundException;
 import nl.hu.cisq1.lingo.trainer.domain.state.StateRound;
 import org.junit.jupiter.api.DisplayName;
@@ -20,7 +19,7 @@ class RoundTest {
 
     @Test
     @DisplayName("Create empty Round")
-    void createEmptyFeedback() {
+    void createEmptyRound() {
         Round emptyRound = new Round();
         assertNull(emptyRound.getRoundId());
         assertNull(emptyRound.getWordToGuess());
@@ -244,8 +243,8 @@ class RoundTest {
 
     @ParameterizedTest
     @MethodSource("provideEqualsExamples")
-    @DisplayName("Feedback equals and hashcode methods test")
-    void feedbackEqualsHashcode(Round round, Round compareRound, boolean isEqual) {
+    @DisplayName("Round equals and hashcode methods test")
+    void roundEqualsHashcode(Round round, Round compareRound, boolean isEqual) {
         assertEquals(round.equals(compareRound), isEqual);
 
         if (compareRound != null) {

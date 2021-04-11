@@ -59,16 +59,16 @@ class TrainerControllerIntegrationTest {
                 );
     }
 
-//    @Test
-//    @DisplayName("get game throws exception when not found")
-//    void getGameThrows() throws Exception {
-//        Long id = game.getGameId()+1;
-//        mockMvc.perform(
-//                get("/games/{gameId}", id))
-//                .andExpect(content().contentType("application/json"))
-//                .andExpect(status().isNotFound())
-//                .andExpect(jsonPath("$.errors").value("vul"));
-//    }
+    @Test
+    @DisplayName("get game throws exception when not found")
+    void getGameThrows() throws Exception {
+        Long id = game.getGameId()+1;
+        mockMvc.perform(
+                get("/games/{gameId}", id))
+                .andExpect(content().contentType("application/json"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("Game with id "+ id + " not found"));
+    }
 
     @Test
     @DisplayName("get round")
@@ -85,16 +85,16 @@ class TrainerControllerIntegrationTest {
                 .andExpect(jsonPath("$.feedbackList").isArray());
     }
 
-//    @Test
-//    @DisplayName("get round")
-//    void getRoundThrows() throws Exception {
-//        Long id = game.getGameId()+1;
-//        mockMvc.perform(
-//                get("/games/currentRound/{gameId}", id))
-//                .andExpect(content().contentType("application/json"))
-//                .andExpect(status().isNotFound())
-//                .andExpect(jsonPath("$.errors").value("vul"));
-//    }
+    @Test
+    @DisplayName("get round throws exception when game is not found")
+    void getRoundThrows() throws Exception {
+        Long id = game.getGameId()+1;
+        mockMvc.perform(
+                get("/games/currentRound/{gameId}", id))
+                .andExpect(content().contentType("application/json"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("Game with id "+ id + " not found"));
+    }
 
     @Test
     @DisplayName("create a game")
@@ -127,15 +127,15 @@ class TrainerControllerIntegrationTest {
                 .andExpect(jsonPath("$.feedbackList").isArray());
     }
 
-//    @Test
-//    @DisplayName("create a round throws exception when round is still ongoing")
-//    void createRoundThrows() throws Exception {
-//        mockMvc.perform(
-//                post("/games/createRound/{gameId}", game.getGameId()))
-//                .andExpect(content().contentType("application/json"))
-//                .andExpect(status().isConflict())
-//                .andExpect(jsonPath("$.errors").value("vul"));
-//    }
+    @Test
+    @DisplayName("create a round throws exception when round is still ongoing")
+    void createRoundThrows() throws Exception {
+        mockMvc.perform(
+                post("/games/createRound/{gameId}", game.getGameId()))
+                .andExpect(content().contentType("application/json"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.error").value("finish your last round before you start a new one!"));
+    }
 
     @Test
     @DisplayName("do guess on ongoing round, after guess its still ongoing")
@@ -181,37 +181,23 @@ class TrainerControllerIntegrationTest {
                 .andExpect(jsonPath("$.feedbackList").isArray());
     }
 
-//    @Test
-//    @DisplayName("do guess on ongoing round throws exception when round is already over")
-//    void doGuessThrowsWhenRoundOver() throws Exception {
-//        SERVICE.doGuess(game.getGameId(), game.getLastRound().getWordToGuess());
-//
-//        mockMvc.perform(post("/games/{gameId}/{attempt}", game.getGameId(), "jooow"))
-//                .andExpect(status().isConflict())
-//                .andExpect(jsonPath("$.errors").value("vul"));
-//    }
+    @Test
+    @DisplayName("do guess on ongoing round throws exception when round is already over")
+    void doGuessThrowsWhenRoundOver() throws Exception {
+        SERVICE.doGuess(game.getGameId(), game.getLastRound().getWordToGuess());
 
-//    @Test
-//    @DisplayName("do guess on ongoing round throws exception when game not found")
-//    void doGuessThrowsWhenGameNotFound() throws Exception {
-//        Long id = game.getGameId()+1;
-//
-//        mockMvc.perform(post("/games/{gameId}/{attempt}", id, "jooow"))
-//                .andExpect(status().isNotFound())
-//                .andExpect(jsonPath("$.errors").value("vul"));
-//    }
+        mockMvc.perform(post("/games/{gameId}/{attempt}", game.getGameId(), "jooow"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.error").value("Round already over, start a new round!"));
+    }
 
-    //todo: fix fout codes 404notfound en 409conflict. / vang netjes op
-    // haal getAllGames weg
-    //
+    @Test
+    @DisplayName("do guess on ongoing round throws exception when game not found")
+    void doGuessThrowsWhenGameNotFound() throws Exception {
+        Long id = game.getGameId()+1;
 
-    //todo: check of nodig te lang is meestal invalid terug
-//    @Test
-//    @DisplayName("do guess on ongoing round throws exception when length guess is not the same as word to guess")
-//    void doGuessThrows() throws Exception {
-//        mockMvc.perform(post("/games/{gameId}/{attempt}", game.getGameId(), "joooow"))
-//                .andExpect(status().isNotFound()
-//                        //todo: welke fout code?
-//                );
-//    }
+        mockMvc.perform(post("/games/{gameId}/{attempt}", id, "jooow"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("Game with id "+ id + " not found"));
+    }
 }
