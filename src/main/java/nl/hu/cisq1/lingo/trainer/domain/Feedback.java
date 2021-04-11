@@ -1,7 +1,5 @@
 package nl.hu.cisq1.lingo.trainer.domain;
 
-import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidFeedbackException;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
