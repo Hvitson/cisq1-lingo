@@ -83,6 +83,7 @@ class TrainerServiceTest {
     @Test
     @DisplayName("start a new round on a game")
     void startRound() {
+        game.doGuess("appel");
         when(wordService.provideRandomWord(6)).thenReturn("appell");
         when(gameRepository.findById(10L)).thenReturn(Optional.of(game));
         when(gameRepository.save(game)).thenReturn(game);
